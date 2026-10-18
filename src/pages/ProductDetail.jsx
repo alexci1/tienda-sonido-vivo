@@ -4,95 +4,99 @@ import { useParams, Link } from 'react-router-dom';
 
 export default function ProductDetail({ productos, onAgregar }) {
   const { id } = useParams();
-  const [cantidad, setCantidad] = useState(1);
+  const producto = productos.find((p) => (p.codigo || String(p.id)) === id);
 
-  // Buscar el producto por código o id
-  const producto = productos.find(
-    (p) => String(p.codigo || p.id) === String(id)
-  );
+  const [cantidad, setCantidad] = useState(1);
 
   if (!producto) {
     return (
       <div className="container py-5 text-center text-light">
         <h2>Producto no encontrado 🔍</h2>
-        <p className="text-secondary">El producto que buscas no existe o fue eliminado.</p>
-        <Link to="/products" className="btn btn-primary mt-3">
+        <p className="text-secondary mb-4">El producto que buscas no existe o fue retirado del catálogo.</p>
+        <Link to="/products" className="btn btn-primary">
           Volver al Catálogo
         </Link>
       </div>
     );
   }
 
-  const cambiarCantidad = (cambio) => {
-    setCantidad((prev) => Math.max(1, prev + cambio));
-  };
+  const stock = producto.stock ?? 10;
+  const sinStock = stock <= 0;
 
-  const handleAgregar = () => {
-    onAgregar(producto, cantidad);
-    setCantidad(1); // Reiniciar a 1 tras agregar
+  const handleCantidad = (cambio) => {
+    setCantidad((actual) => Math.min(Math.max(1, actual + cambio), stock));
   };
 
   return (
     <div className="container py-5 text-light">
-      <Link to="/products" className="btn btn-outline-light mb-4">
+      <Link to="/products" className="btn btn-outline-secondary btn-sm mb-4">
         ← Volver al Catálogo
       </Link>
 
-      <div className="row g-4 align-items-center">
+      <div className="row g-5 bg-dark p-4 rounded border border-secondary">
+        {/* Imagen */}
         <div className="col-md-6 text-center">
           <img
-            src={producto.imagen || "https://via.placeholder.com/500x400?text=Audio"}
+            src={producto.imagen || "https://via.placeholder.com/400x300?text=Audio"}
             alt={producto.nombre}
-            className="img-fluid rounded shadow"
-            style={{ maxHeight: '400px', objectFit: 'cover' }}
+            className="img-fluid rounded border border-secondary"
+            style={{ maxHeight: '380px', objectFit: 'contain' }}
           />
         </div>
 
-        <div className="col-md-6">
-          <span className="badge bg-secondary mb-2 px-3 py-2 fs-6">{producto.marca}</span>
-          
-          {/* Título blanco brillante */}
-          <h1 className="mb-3 text-white fw-bold">{producto.nombre}</h1>
-          
-          {/* Precio destacado */}
+        {/* Detalles */}
+        <div className="col-md-6 d-flex flex-column justify-content-center">
+          <div className="mb-2">
+            <span className="badge bg-secondary me-2">{producto.marca}</span>
+            {sinStock ? (
+              <span className="badge bg-danger">Agotado</span>
+            ) : (
+              <span className={`badge ${stock <= 3 ? 'bg-warning text-dark' : 'bg-success'}`}>
+                {stock} unidades disponibles
+              </span>
+            )}
+          </div>
+
+          <h1 className="text-white fw-bold mb-3">{producto.nombre}</h1>
           <p className="fs-3 fw-bold text-primary mb-3">
             ${producto.precio?.toLocaleString("es-CL")}
           </p>
 
-          {/* Descripción en gris claro readable */}
-          {producto.descripcion && (
-            <p className="mb-4 text-light opacity-75 fs-5" style={{ lineHeight: '1.6' }}>
-              {producto.descripcion}
-            </p>
+          <p className="text-light opacity-75 mb-4">
+            {producto.descripcion || "Equipo de audio profesional de alta calidad, diseñado para un rendimiento óptimo en estudio y presentaciones en vivo."}
+          </p>
+
+          {!sinStock && (
+            <div className="d-flex align-items-center gap-3 mb-4">
+              <span className="fw-semibold">Cantidad:</span>
+              <div className="d-flex align-items-center gap-2">
+                <button
+                  className="btn btn-outline-light btn-sm"
+                  disabled={cantidad <= 1}
+                  onClick={() => handleCantidad(-1)}
+                >
+                  -
+                </button>
+                <span className="fw-bold px-3 py-1 bg-dark text-light rounded border border-secondary">
+                  {cantidad}
+                </span>
+                <button
+                  className="btn btn-outline-light btn-sm"
+                  disabled={cantidad >= stock}
+                  onClick={() => handleCantidad(1)}
+                >
+                  +
+                </button>
+              </div>
+            </div>
           )}
 
-          {/* Selector de cantidad ajustado a tema oscuro */}
-          <div className="mb-4">
-            <label className="form-label d-block fw-bold text-light fs-6">Cantidad:</label>
-            <div className="d-flex align-items-center gap-2" style={{ maxWidth: '160px' }}>
-              <button
-                type="button"
-                className="btn btn-outline-light"
-                onClick={() => cambiarCantidad(-1)}
-              >
-                -
-              </button>
-              <span className="form-control text-center fw-bold bg-dark text-light border-secondary fs-5">
-                {cantidad}
-              </span>
-              <button
-                type="button"
-                className="btn btn-outline-light"
-                onClick={() => cambiarCantidad(1)}
-              >
-                +
-              </button>
-            </div>
-          </div>
-
-          {/* Botón de agregar */}
-          <button className="btn btn-primary btn-lg w-100 fw-bold" onClick={handleAgregar}>
-            Agregar al Carrito
+          <button
+            className={`btn btn-lg fw-bold ${sinStock ? 'btn-secondary' : 'btn-primary'}`}
+            disabled={sinStock}
+            onClick={() => onAgregar(producto, cantidad)}
+          >
+            {sinStock ? 'Producto Agotado' : 'Agregar al Carrito'}
           </button>
         </div>
       </div>
