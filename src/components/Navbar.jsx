@@ -5,7 +5,7 @@ export default function Navbar({ cantidadCarrito }) {
     <header>
       <nav className="nav-bar">
         <div className="logo">
-          <Link to="/images/icon/icon-sonido-vivo.png">
+          <Link to="/">
             {/* Si tienes una imagen para Sonido Vivo, cámbiala aquí, o usa texto/icono */}
             <span style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>🎧 SONIDO VIVO</span>
           </Link>
@@ -13,10 +13,10 @@ export default function Navbar({ cantidadCarrito }) {
 
         <ul className="nav-links">
           <li>
-            <Link to="/" className="active">INICIO</Link>
+            <Link to="/">INICIO</Link>
           </li>
           <li>
-            <Link to="/Products">PRODUCTOS</Link>
+            <Link to="/products">PRODUCTOS</Link>
           </li>
           <li>
             <Link to="/contacto">CONTACTO</Link>

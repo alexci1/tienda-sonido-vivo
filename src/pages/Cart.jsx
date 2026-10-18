@@ -12,14 +12,14 @@ export default function Cart({ carrito, total, onEliminar }) {
           <div className="col-lg-8 mx-auto">
             <ul className="list-group mb-4">
               {carrito.map((item) => (
-                <li key={item.id} className="list-group-item d-flex justify-content-between align-items-center bg-dark text-white border-secondary mb-2 rounded">
+                <li key={item.codigo || item.id} className="list-group-item d-flex justify-content-between align-items-center bg-dark text-white border-secondary mb-2 rounded">
                   <div>
                     <h5 className="mb-1">{item.nombre}</h5>
                     <small className="text-muted">Cantidad: {item.cantidad} | Precio unitario: ${item.precio.toLocaleString("es-CL")}</small>
                   </div>
                   <div className="d-flex align-items-center gap-3">
                     <span className="fw-bold text-info">${(item.precio * item.cantidad).toLocaleString("es-CL")}</span>
-                    <button className="btn btn-outline-danger btn-sm" onClick={() => onEliminar(item.id)}>
+                    <button className="btn btn-outline-danger btn-sm" onClick={() => onEliminar(item.codigo || item.id)}>
                       Eliminar
                     </button>
                   </div>

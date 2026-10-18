@@ -1,6 +1,6 @@
 // src/App.jsx
 import { useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import RutaProtegida from './components/RutaProtegida';
@@ -30,8 +30,8 @@ function App() {
     });
   };
 
-  const eliminarDelCarrito = (id) => {
-    setCarrito((actual) => actual.filter((item) => item.id !== id));
+  const eliminarDelCarrito = (identificador) => {
+    setCarrito((actual) => actual.filter((item) => (item.codigo || item.id) !== identificador));
   };
 
   const totalCarrito = carrito.reduce((suma, item) => suma + item.precio * item.cantidad, 0);
@@ -40,8 +40,8 @@ function App() {
     setProductos([...productos, { ...nuevoProd, id: Date.now() }]);
   };
 
-  const eliminarProductoCatalogo = (id) => {
-    setProductos(productos.filter((p) => p.id !== id));
+  const eliminarProductoCatalogo = (identificador) => {
+    setProductos(productos.filter((p) => (p.codigo || p.id) !== identificador));
   };
 
   return (
@@ -60,8 +60,12 @@ function App() {
             element={<ProductDetail productos={productos} onAgregar={agregarAlCarrito} />} 
           />
           <Route 
-            path="/cart" 
+            path="/carrito" 
             element={<CarritoPage carrito={carrito} total={totalCarrito} onEliminar={eliminarDelCarrito} />} 
+          />
+          <Route 
+            path="/cart" 
+            element={<Navigate to="/carrito" replace />} 
           />
           <Route 
             path="/login" 
