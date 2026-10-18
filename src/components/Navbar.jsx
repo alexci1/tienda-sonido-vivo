@@ -11,78 +11,68 @@ export default function Navbar({ cantidadCarrito }) {
     navigate('/login');
   };
 
+  // Verificamos si el usuario activo es Admin o Vendedor
+  const esPersonalInterno = sesion?.rol === 'Administrador' || sesion?.rol === 'Vendedor';
+
   return (
-    <header>
-      <nav className="nav-bar">
+    <header className="navbar-modern-header">
+      <nav className="nav-bar-modern">
         <div className="logo">
-          <Link to="/">
-            <span style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>🎧 SONIDO VIVO</span>
+          <Link to="/" className="logo-brand">
+            <img 
+              src="/images/icon/icon-sonido-vivo.png" 
+              alt="Sonido Vivo Logo" 
+              className="navbar-logo-img" 
+            />
+            <span>
+              <span style={{ color: '#ffffff' }}>SONIDO</span>{' '}
+              <span style={{ color: '#0099ff' }}>VIVO</span>
+            </span>
           </Link>
         </div>
 
-        <ul className="nav-links">
-          <li>
-            <NavLink to="/" end>INICIO</NavLink>
-          </li>
-          <li>
-            <NavLink to="/categories">CATÁLOGO</NavLink> {/* Unifica productos y categorías aquí */}
-          </li>
-          <li>
-            <NavLink to="/nosotros">NOSOTROS</NavLink>
-          </li>
-          <li>
-            <NavLink to="/contacto">CONTACTO</NavLink>
-          </li>
+        <ul className="nav-links-modern">
+          <li><NavLink to="/" end>INICIO</NavLink></li>
+          <li><NavLink to="/categories">CATÁLOGO</NavLink></li>
+          <li><NavLink to="/nosotros">NOSOTROS</NavLink></li>
+          <li><NavLink to="/contacto">CONTACTO</NavLink></li>
         </ul>
 
-        <div className="nav-actions">
+        <div className="nav-actions-modern">
           {sesion ? (
             <>
-              {/* Si es Admin o Vendedor, muestra acceso al Panel */}
-              {(sesion.rol === 'Administrador' || sesion.rol === 'Vendedor') && (
-                <>
-                  <Link to="/admin" className="login-link" style={{ color: '#ffc107', fontWeight: 'bold' }}>
-                    <span>PANEL ({sesion.rol.toUpperCase()})</span>
-                  </Link>
-                  <span className="separator">|</span>
-                </>
+              {/* Si es Admin o Vendedor, muestra acceso al Panel estilizado */}
+              {esPersonalInterno && (
+                <Link to="/admin" className="badge-admin">
+                  ⚙️ PANEL ({sesion.rol.toUpperCase()})
+                </Link>
               )}
 
-              {/* Muestra el nombre/usuario activo */}
-              <span style={{ fontSize: '0.9rem', color: '#0d6efd', fontWeight: 'bold' }}>
-                👤 {sesion.nombre || sesion.usuario}
-              </span>
+              {/* Saludo y rol del usuario con diseño tech */}
+              <div className="user-badge-container">
+                <span className="user-name">👤 {sesion.nombre || sesion.usuario}</span>
+                <span className="user-role-tag">{sesion.rol}</span>
+              </div>
 
-              <span className="separator">|</span>
-
-              {/* Botón Salir */}
-              <button
-                onClick={handleCerrarSesion}
-                className="login-link"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: '#dc3545',
-                  fontWeight: 'bold',
-                  padding: 0,
-                  fontFamily: 'inherit'
-                }}
-              >
+              {/* Botón Salir rediseñado */}
+              <button onClick={handleCerrarSesion} className="btn-logout-tech">
                 SALIR
               </button>
             </>
           ) : (
-            <Link to="/login" className="login-link">
-              <span>INICIAR SESIÓN</span>
+            <Link to="/login" className="btn-login">
+              INICIAR SESIÓN
             </Link>
           )}
 
-          <span className="separator">|</span>
-
-          <Link to="/carrito" className="cart-link">
-            <span>🛒 CARRITO ({cantidadCarrito})</span>
-          </Link>
+          {/* El carrito se oculta automáticamente si es Administrador o Vendedor */}
+          {!esPersonalInterno && (
+            <Link to="/carrito" className="cart-pill">
+              <span>🛒</span>
+              <span className="cart-text">CARRITO</span>
+              <span className="cart-badge">{cantidadCarrito}</span>
+            </Link>
+          )}
         </div>
       </nav>
     </header>

@@ -82,51 +82,45 @@ export default function Admin({ productos, onAgregar, onEliminar }) {
   ).length;
 
   return (
-    <div className="container py-5 text-white">
+    <div className="admin-dashboard-container">
       {/* Cabecera */}
-      <div className="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary flex-wrap gap-2">
+      <div className="admin-header-section">
         <div>
-          <h2 className="fw-bold m-0" style={{ letterSpacing: "1px" }}>
-            PANEL ADMINISTRATIVO
-          </h2>
-          <p className="text-secondary m-0">
+          <h1>PANEL ADMINISTRATIVO</h1>
+          <p className="m-0">
             Bienvenido, <strong className="text-white">{sesion?.usuario}</strong> | Rol:{" "}
             <span className="badge bg-info text-dark">{sesion?.rol}</span>
           </p>
         </div>
-        <button className="btn btn-outline-danger fw-bold" onClick={salir}>
+        <button className="btn btn-outline-danger fw-bold btn-sm px-3 py-2" onClick={salir}>
           🚪 Cerrar sesión
         </button>
       </div>
 
       {/* Tarjetas KPI de Resumen */}
-      <div className="row g-3 mb-4">
-        <div className="col-md-4" onClick={() => setPestaña("productos")} style={{ cursor: "pointer" }}>
-          <div className="card p-3 text-center bg-dark border-secondary h-100 shadow-sm">
-            <h3 className="text-info fw-bold">{productos.length}</h3>
-            <span className="text-secondary">Productos en Catálogo</span>
-          </div>
+      <div className="admin-kpi-grid">
+        <div className="admin-kpi-card" onClick={() => setPestaña("productos")} style={{ cursor: "pointer" }}>
+          <span className="kpi-label">Productos en Catálogo</span>
+          <span className="kpi-number">{productos.length}</span>
         </div>
-        <div className="col-md-4" onClick={() => setPestaña("pedidos")} style={{ cursor: "pointer" }}>
-          <div className="card p-3 text-center bg-dark border-secondary h-100 shadow-sm">
-            <h3 className="text-warning fw-bold">{pedidosPendientes}</h3>
-            <span className="text-secondary">Pedidos Pendientes</span>
-          </div>
+        <div className="admin-kpi-card" onClick={() => setPestaña("pedidos")} style={{ cursor: "pointer" }}>
+          <span className="kpi-label">Pedidos Pendientes</span>
+          <span className="kpi-number" style={{ color: pedidosPendientes > 0 ? "#ffc107" : "#0099ff" }}>
+            {pedidosPendientes}
+          </span>
         </div>
-        <div className="col-md-4" onClick={() => esAdmin && setPestaña("usuarios")} style={{ cursor: esAdmin ? "pointer" : "default" }}>
-          <div className="card p-3 text-center bg-dark border-secondary h-100 shadow-sm">
-            <h3 className="text-success fw-bold">{usuarios.length}</h3>
-            <span className="text-secondary">Usuarios Registrados</span>
-          </div>
+        <div className="admin-kpi-card" onClick={() => esAdmin && setPestaña("usuarios")} style={{ cursor: esAdmin ? "pointer" : "default" }}>
+          <span className="kpi-label">Usuarios Registrados</span>
+          <span className="kpi-number" style={{ color: "#22c55e" }}>{usuarios.length}</span>
         </div>
       </div>
 
-      {/* Navegación por pestañas */}
-      <div className="btn-group mb-4 w-100 flex-wrap" role="group">
+      {/* Navegación por pestañas con diseño Tech */}
+      <div className="btn-group mb-4 w-100 flex-wrap shadow-sm" role="group">
         <button
-          className={`btn py-2 fw-bold ${
+          className={`btn py-2.5 fw-bold ${
             pestaña === "pedidos"
-              ? "btn-primary"
+              ? "btn-primary shadow"
               : "btn-dark text-light border-secondary"
           }`}
           onClick={() => setPestaña("pedidos")}
@@ -135,9 +129,9 @@ export default function Admin({ productos, onAgregar, onEliminar }) {
         </button>
 
         <button
-          className={`btn py-2 fw-bold ${
+          className={`btn py-2.5 fw-bold ${
             pestaña === "productos"
-              ? "btn-primary"
+              ? "btn-primary shadow"
               : "btn-dark text-light border-secondary"
           }`}
           onClick={() => setPestaña("productos")}
@@ -147,9 +141,9 @@ export default function Admin({ productos, onAgregar, onEliminar }) {
 
         {esAdmin && (
           <button
-            className={`btn py-2 fw-bold ${
+            className={`btn py-2.5 fw-bold ${
               pestaña === "usuarios"
-                ? "btn-primary"
+                ? "btn-primary shadow"
                 : "btn-dark text-light border-secondary"
             }`}
             onClick={() => setPestaña("usuarios")}
@@ -161,13 +155,13 @@ export default function Admin({ productos, onAgregar, onEliminar }) {
 
       {/* PESTAÑA 1: GESTIÓN DE PEDIDOS */}
       {pestaña === "pedidos" && (
-        <div className="bg-dark p-4 rounded border border-secondary shadow-sm">
-          <h4 className="text-white mb-3">Órdenes de Compra y Seguimiento</h4>
+        <div className="admin-section-card">
+          <h3 className="mb-3">Órdenes de Compra y Seguimiento</h3>
           {pedidos.length === 0 ? (
             <p className="text-secondary mb-0">No hay pedidos registrados en el sistema actualmente.</p>
           ) : (
             <div className="table-responsive">
-              <table className="table table-dark table-hover align-middle border-secondary">
+              <table className="table table-dark table-hover align-middle border-secondary mb-0">
                 <thead>
                   <tr>
                     <th>N° Pedido</th>
@@ -230,11 +224,11 @@ export default function Admin({ productos, onAgregar, onEliminar }) {
         <div className="row g-4">
           {/* Formulario Agregar Producto */}
           <div className="col-lg-4">
-            <div className="bg-dark p-4 rounded border border-secondary shadow-sm">
-              <h4 className="text-white mb-3">+ Nuevo Producto</h4>
+            <div className="admin-section-card h-100">
+              <h3 className="mb-3">+ Nuevo Producto</h3>
               <form onSubmit={handleCrearProducto}>
                 <div className="mb-2">
-                  <label className="form-label text-light">Código *</label>
+                  <label className="form-label text-light fs-6">Código *</label>
                   <input
                     type="text"
                     required
@@ -247,7 +241,7 @@ export default function Admin({ productos, onAgregar, onEliminar }) {
                   />
                 </div>
                 <div className="mb-2">
-                  <label className="form-label text-light">Nombre *</label>
+                  <label className="form-label text-light fs-6">Nombre *</label>
                   <input
                     type="text"
                     required
@@ -260,7 +254,7 @@ export default function Admin({ productos, onAgregar, onEliminar }) {
                 </div>
                 <div className="row g-2 mb-2">
                   <div className="col-6">
-                    <label className="form-label text-light">Marca</label>
+                    <label className="form-label text-light fs-6">Marca</label>
                     <input
                       type="text"
                       className="form-control bg-dark text-light border-secondary"
@@ -271,7 +265,7 @@ export default function Admin({ productos, onAgregar, onEliminar }) {
                     />
                   </div>
                   <div className="col-6">
-                    <label className="form-label text-light">Precio (CLP) *</label>
+                    <label className="form-label text-light fs-6">Precio (CLP) *</label>
                     <input
                       type="number"
                       required
@@ -284,7 +278,7 @@ export default function Admin({ productos, onAgregar, onEliminar }) {
                   </div>
                 </div>
                 <div className="mb-2">
-                  <label className="form-label text-light">Stock Inicial</label>
+                  <label className="form-label text-light fs-6">Stock Inicial</label>
                   <input
                     type="number"
                     className="form-control bg-dark text-light border-secondary"
@@ -295,7 +289,7 @@ export default function Admin({ productos, onAgregar, onEliminar }) {
                   />
                 </div>
                 <div className="mb-3">
-                  <label className="form-label text-light">URL Imagen</label>
+                  <label className="form-label text-light fs-6">URL Imagen</label>
                   <input
                     type="text"
                     placeholder="https://..."
@@ -306,7 +300,7 @@ export default function Admin({ productos, onAgregar, onEliminar }) {
                     }
                   />
                 </div>
-                <button type="submit" className="btn btn-success w-100 fw-bold">
+                <button type="submit" className="admin-btn-primary w-100 fw-bold py-2 mt-2">
                   Guardar Producto
                 </button>
               </form>
@@ -315,10 +309,10 @@ export default function Admin({ productos, onAgregar, onEliminar }) {
 
           {/* Tabla de Productos */}
           <div className="col-lg-8">
-            <div className="bg-dark p-4 rounded border border-secondary shadow-sm">
-              <h4 className="text-white mb-3">Inventario en Bodega</h4>
-              <div className="table-responsive" style={{ maxHeight: "450px", overflowY: "auto" }}>
-                <table className="table table-dark table-striped align-middle border-secondary">
+            <div className="admin-section-card h-100">
+              <h3 className="mb-3">Inventario en Bodega</h3>
+              <div className="table-responsive" style={{ maxHeight: "480px", overflowY: "auto" }}>
+                <table className="table table-dark table-striped align-middle border-secondary mb-0">
                   <thead>
                     <tr>
                       <th>Código</th>
@@ -335,7 +329,7 @@ export default function Admin({ productos, onAgregar, onEliminar }) {
                         <tr key={keyProd}>
                           <td className="fw-bold text-primary">{prod.codigo}</td>
                           <td>
-                            <div>{prod.nombre}</div>
+                            <div className="text-white fw-bold">{prod.nombre}</div>
                             <small className="text-secondary">{prod.marca}</small>
                           </td>
                           <td>${prod.precio?.toLocaleString("es-CL")}</td>
@@ -369,10 +363,10 @@ export default function Admin({ productos, onAgregar, onEliminar }) {
 
       {/* PESTAÑA 3: USUARIOS (RBAC) */}
       {pestaña === "usuarios" && esAdmin && (
-        <div className="bg-dark p-4 rounded border border-secondary shadow-sm">
-          <h4 className="text-white mb-3">Usuarios Registrados en el Sistema (RBAC)</h4>
+        <div className="admin-section-card">
+          <h3 className="mb-3">Usuarios Registrados en el Sistema (RBAC)</h3>
           <div className="table-responsive">
-            <table className="table table-dark table-hover align-middle border-secondary">
+            <table className="table table-dark table-hover align-middle border-secondary mb-0">
               <thead>
                 <tr>
                   <th>ID</th>
