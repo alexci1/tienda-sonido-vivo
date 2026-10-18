@@ -25,7 +25,7 @@ export default function Navbar({ cantidadCarrito }) {
             <NavLink to="/" end>INICIO</NavLink>
           </li>
           <li>
-            <NavLink to="/products">PRODUCTOS</NavLink>
+            <NavLink to="/categories">CATÁLOGO</NavLink> {/* Unifica productos y categorías aquí */}
           </li>
           <li>
             <NavLink to="/nosotros">NOSOTROS</NavLink>

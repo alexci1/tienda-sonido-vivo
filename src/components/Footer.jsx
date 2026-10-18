@@ -32,7 +32,7 @@ export default function Footer() {
           <Link to="/" className="menu-icon">Inicio</Link>
         </li>
         <li className="menu-elem">
-          <Link to="/products" className="menu-icon">Productos</Link>
+          <Link to="/categories" className="menu-icon">Catálogo</Link>
         </li>
         <li className="menu-elem">
           <Link to="/nosotros" className="menu-icon">Nosotros</Link>

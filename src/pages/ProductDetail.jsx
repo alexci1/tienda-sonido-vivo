@@ -10,12 +10,12 @@ export default function ProductDetail({ productos, onAgregar }) {
 
   if (!producto) {
     return (
-      <div className="container py-5 text-center text-light">
-        <h2>Producto no encontrado 🔍</h2>
-        <p className="text-secondary mb-4">El producto que buscas no existe o fue retirado del catálogo.</p>
-        <Link to="/products" className="btn btn-primary">
-          Volver al Catálogo
+      <div className="product-detail-container text-center py-5">
+        <Link to="/categories" className="back-catalog-btn mb-4">
+          ← Volver al Catálogo
         </Link>
+        <h2 className="text-white mt-3">Producto no encontrado 🔍</h2>
+        <p className="text-secondary mb-4">El producto que buscas no existe o fue retirado del catálogo.</p>
       </div>
     );
   }
@@ -28,50 +28,51 @@ export default function ProductDetail({ productos, onAgregar }) {
   };
 
   return (
-    <div className="container py-5 text-light">
-      <Link to="/products" className="btn btn-outline-secondary btn-sm mb-4">
+    <div className="product-detail-container">
+      {/* Botón Volver estilizado fuera de la tarjeta principal */}
+      <Link to="/categories" className="back-catalog-btn">
         ← Volver al Catálogo
       </Link>
 
-      <div className="row g-5 bg-dark p-4 rounded border border-secondary">
-        {/* Imagen */}
-        <div className="col-md-6 text-center">
+      <div className="product-detail-card">
+        {/* Imagen del Producto */}
+        <div className="product-detail-image-wrapper">
           <img
             src={producto.imagen || "https://via.placeholder.com/400x300?text=Audio"}
             alt={producto.nombre}
-            className="img-fluid rounded border border-secondary"
-            style={{ maxHeight: '380px', objectFit: 'contain' }}
           />
         </div>
 
-        {/* Detalles */}
-        <div className="col-md-6 d-flex flex-column justify-content-center">
-          <div className="mb-2">
-            <span className="badge bg-secondary me-2">{producto.marca}</span>
+        {/* Detalles e Información */}
+        <div className="product-detail-info">
+          <div className="d-flex align-items-center gap-2 mb-1 flex-wrap">
+            <span className="product-detail-category">{producto.categoria}</span>
+            <span className="badge bg-secondary">{producto.marca}</span>
             {sinStock ? (
               <span className="badge bg-danger">Agotado</span>
             ) : (
               <span className={`badge ${stock <= 3 ? 'bg-warning text-dark' : 'bg-success'}`}>
-                {stock} unidades disponibles
+                {stock} disponibles
               </span>
             )}
           </div>
 
-          <h1 className="text-white fw-bold mb-3">{producto.nombre}</h1>
-          <p className="fs-3 fw-bold text-primary mb-3">
-            ${producto.precio?.toLocaleString("es-CL")}
-          </p>
+          <h1>{producto.nombre}</h1>
 
-          <p className="text-light opacity-75 mb-4">
+          <div className="product-detail-price">
+            ${producto.precio?.toLocaleString("es-CL")}
+          </div>
+
+          <p className="product-detail-description">
             {producto.descripcion || "Equipo de audio profesional de alta calidad, diseñado para un rendimiento óptimo en estudio y presentaciones en vivo."}
           </p>
 
           {!sinStock && (
-            <div className="d-flex align-items-center gap-3 mb-4">
-              <span className="fw-semibold">Cantidad:</span>
+            <div className="d-flex align-items-center gap-3 my-2">
+              <span className="fw-semibold text-light">Cantidad:</span>
               <div className="d-flex align-items-center gap-2">
                 <button
-                  className="btn btn-outline-light btn-sm"
+                  className="btn btn-outline-light btn-sm px-3"
                   disabled={cantidad <= 1}
                   onClick={() => handleCantidad(-1)}
                 >
@@ -81,7 +82,7 @@ export default function ProductDetail({ productos, onAgregar }) {
                   {cantidad}
                 </span>
                 <button
-                  className="btn btn-outline-light btn-sm"
+                  className="btn btn-outline-light btn-sm px-3"
                   disabled={cantidad >= stock}
                   onClick={() => handleCantidad(1)}
                 >
@@ -91,13 +92,15 @@ export default function ProductDetail({ productos, onAgregar }) {
             </div>
           )}
 
-          <button
-            className={`btn btn-lg fw-bold ${sinStock ? 'btn-secondary' : 'btn-primary'}`}
-            disabled={sinStock}
-            onClick={() => onAgregar(producto, cantidad)}
-          >
-            {sinStock ? 'Producto Agotado' : 'Agregar al Carrito'}
-          </button>
+          <div className="product-detail-actions mt-3">
+            <button
+              className={sinStock ? 'btn btn-secondary w-100 py-3 fw-bold' : ''}
+              disabled={sinStock}
+              onClick={() => onAgregar(producto, cantidad)}
+            >
+              {sinStock ? 'Producto Agotado' : '🛒 Agregar al Carrito'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -17,20 +17,16 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background-image: 
-        linear-gradient(
-            to bottom,
+    background-image:
+        linear-gradient(to bottom,
             rgba(11, 11, 15, 0.0) 0%,
             rgba(11, 11, 15, 0.4) 40%,
-            rgba(11, 11, 15, 0.9) 70%,   
-            #0b0b0f 95%                 
-        ),
-        linear-gradient(
-            to bottom, 
-            rgba(11, 11, 15, 0.75) 0%,   
-            rgba(11, 11, 15, 0.85) 50%,  
-            rgba(11, 11, 15, 0.95) 100%  
-        );
+            rgba(11, 11, 15, 0.9) 70%,
+            #0b0b0f 95%),
+        linear-gradient(to bottom,
+            rgba(11, 11, 15, 0.75) 0%,
+            rgba(11, 11, 15, 0.85) 50%,
+            rgba(11, 11, 15, 0.95) 100%);
     background-size: cover;
     background-position: center top;
     background-repeat: no-repeat;
@@ -78,8 +74,8 @@ header {
 }
 
 .logo-img {
-    height: 40px; 
-    width: auto;  
+    height: 40px;
+    width: auto;
     object-fit: contain;
 }
 
@@ -273,7 +269,7 @@ header {
     border-color: #25252d !important;
 }
 
-.table-striped > tbody > tr:nth-of-type(odd) {
+.table-striped>tbody>tr:nth-of-type(odd) {
     background-color: #1b1b24 !important;
     color: #ffffff !important;
 }
@@ -510,7 +506,244 @@ header {
     color: #d1d1db;
 }
 
-/* --- RESPONSIVIDAD --- */
+#categoriasCarousel {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+#categoriasCarousel .carousel-item .row {
+    display: flex;
+    align-items: center;
+    background-color: #15151c;
+    border: 1px solid #25252d;
+    border-radius: 12px;
+    padding: 30px;
+    margin: 0;
+}
+
+#categoriasCarousel .carousel-item img {
+    height: 200px;
+    object-fit: contain;
+    width: 100%;
+    background-color: #0b0b0f;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+#categoriasCarousel .carousel-control-prev,
+#categoriasCarousel .carousel-control-next {
+    width: 5%;
+}
+
+@media (max-width: 768px) {
+    #categoriasCarousel .carousel-item .row {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+}
+
+.categories-view {
+    max-width: 1300px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.categories-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.category-btn {
+    background-color: #15151c;
+    border: 1px solid #333340;
+    color: #e2e2e9;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.category-btn:hover,
+.category-btn.active {
+    background-color: #0099ff;
+    border-color: #0099ff;
+    color: #ffffff;
+    box-shadow: 0 0 15px rgba(0, 153, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.product-detail-container {
+    max-width: 1100px;
+    margin: 50px auto;
+    padding: 0 20px;
+}
+
+.product-detail-card {
+    background-color: #15151c;
+    border: 1px solid #25252d;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7);
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.product-detail-image-wrapper {
+    background-color: #0b0b0f;
+    border: 1px solid #25252d;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 380px;
+}
+
+.product-detail-image-wrapper img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.product-detail-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.product-detail-category {
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #0099ff;
+    background-color: rgba(0, 153, 255, 0.1);
+    padding: 4px 10px;
+    border-radius: 4px;
+    width: fit-content;
+}
+
+.product-detail-info h1 {
+    font-size: 28px;
+    color: #ffffff;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+.product-detail-meta {
+    display: flex;
+    gap: 20px;
+    color: #a0a0b0;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.product-detail-meta span strong {
+    color: #ffffff;
+}
+
+.product-detail-price {
+    font-size: 32px;
+    font-weight: bold;
+    color: #0099ff;
+    margin: 10px 0;
+}
+
+.product-detail-description {
+    color: #d1d1db;
+    font-size: 15px;
+    line-height: 1.6;
+    border-top: 1px solid #25252d;
+    border-bottom: 1px solid #25252d;
+    padding: 15px 0;
+}
+
+.product-detail-stock {
+    font-size: 14px;
+    font-weight: 600;
+    color: #22c55e;
+    /* Verde brillante para indicar stock disponible */
+}
+
+.product-detail-actions {
+    margin-top: 10px;
+}
+
+.product-detail-actions button {
+    background-color: #0099ff;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 28px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(0, 153, 255, 0.3);
+}
+
+.product-detail-actions button:hover {
+    background-color: #007acc;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 153, 255, 0.5);
+}
+
+.back-catalog-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #15151c;
+    color: #0099ff;
+    border: 1px solid #25252d;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.back-catalog-btn:hover {
+    background-color: #0099ff;
+    color: #ffffff;
+    border-color: #0099ff;
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(0, 153, 255, 0.3);
+}
+
+/* Responsividad para móviles */
+@media (max-width: 768px) {
+    .product-detail-card {
+        grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .product-detail-image-wrapper {
+        height: 250px;
+    }
+
+    .product-detail-info h1 {
+        font-size: 22px;
+    }
+
+    .product-detail-price {
+        font-size: 26px;
+    }
+}
+
+
 @media(max-width: 1000px) {
     .nav-bar {
         padding: 0 30px;

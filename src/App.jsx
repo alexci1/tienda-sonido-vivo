@@ -15,6 +15,7 @@ import Login from './pages/Login';
 import Nosotros from './pages/About';
 import Contacto from './pages/Contact';
 import AdminCrud from './pages/Admin';
+import Categories from './pages/Categories.jsx';
 
 function App() {
   const [productos, setProductos] = useState(productosIniciales);
@@ -91,16 +92,16 @@ function App() {
 
       {/* Banner flotante de notificación */}
       {notificacion && (
-        <div 
-          className="alert alert-success alert-dismissible fade show text-center m-0 border-0 rounded-0" 
+        <div
+          className="alert alert-success alert-dismissible fade show text-center m-0 border-0 rounded-0"
           style={{ position: 'sticky', top: 0, zIndex: 1050 }}
           role="alert"
         >
           <strong>✓ {notificacion}</strong>
-          <button 
-            type="button" 
-            className="btn-close" 
-            onClick={() => setNotificacion(null)} 
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setNotificacion(null)}
             aria-label="Close"
           ></button>
         </div>
@@ -109,53 +110,57 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<Inicio />} />
-          <Route 
-            path="/products" 
-            element={<Productos productos={productos} onAgregar={agregarAlCarrito} />} 
+          <Route
+            path="/products"
+            element={<Productos productos={productos} onAgregar={agregarAlCarrito} />}
           />
-          <Route 
-            path="/product/:id" 
-            element={<ProductDetail productos={productos} onAgregar={agregarAlCarrito} />} 
+          <Route
+            path="/categories"
+            element={<Categories productos={productos} onAgregar={agregarAlCarrito} />}
           />
-          <Route 
-            path="/nosotros" 
-            element={<Nosotros />} 
+          <Route
+            path="/product/:id"
+            element={<ProductDetail productos={productos} onAgregar={agregarAlCarrito} />}
           />
-          <Route 
-            path="/contacto" 
-            element={<Contacto />} 
+          <Route
+            path="/nosotros"
+            element={<Nosotros />}
           />
-          <Route 
-            path="/carrito" 
+          <Route
+            path="/contacto"
+            element={<Contacto />}
+          />
+          <Route
+            path="/carrito"
             element={
-              <CarritoPage 
-                carrito={carrito} 
-                total={totalCarrito} 
-                onEliminar={eliminarDelCarrito} 
+              <CarritoPage
+                carrito={carrito}
+                total={totalCarrito}
+                onEliminar={eliminarDelCarrito}
                 onActualizarCantidad={actualizarCantidadCarrito}
                 onVaciar={vaciarCarrito}
               />
-            } 
+            }
           />
-          <Route 
-            path="/cart" 
-            element={<Navigate to="/carrito" replace />} 
+          <Route
+            path="/cart"
+            element={<Navigate to="/carrito" replace />}
           />
-          <Route 
-            path="/login" 
-            element={<Login />} 
+          <Route
+            path="/login"
+            element={<Login />}
           />
-          <Route 
-            path="/admin" 
+          <Route
+            path="/admin"
             element={
               <RutaProtegida>
-                <AdminCrud 
-                  productos={productos} 
-                  onAgregar={agregarProductoCatalogo} 
-                  onEliminar={eliminarProductoCatalogo} 
+                <AdminCrud
+                  productos={productos}
+                  onAgregar={agregarProductoCatalogo}
+                  onEliminar={eliminarProductoCatalogo}
                 />
               </RutaProtegida>
-            } 
+            }
           />
         </Routes>
       </main>
