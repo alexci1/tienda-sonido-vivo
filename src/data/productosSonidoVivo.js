@@ -1,5 +1,6 @@
-export const productosIniciales =[
-    
+// src/data/productosSonidoVivo.js
+
+export const productosIniciales = [
   {
     "codigo": "GA001",
     "categoria": "Guitarras Acústicas",
@@ -8,6 +9,7 @@ export const productosIniciales =[
     "modelo": "F310",
     "stock": 8,
     "precio": 129990,
+    "imagen": "https://i.ebayimg.com/images/g/hv4AAeSwJKtpFodI/s-l1200.jpg",
     "descripcion": "Tapa de abeto, aros y fondo de meranti. Ideal para iniciantes."
   },
   {
@@ -18,6 +20,7 @@ export const productosIniciales =[
     "modelo": "CD-60S",
     "stock": 5,
     "precio": 189990,
+    "imagen": "https://i5.walmartimages.com/seo/Fender-CD-60S-Acoustic-Guitar-Black_2358aa02-fe2a-4aeb-a069-c0337201999f.46b9231edd7239a35ecb60f54a9c4319.png",
     "descripcion": "Tapa de abeto macizo, brazo de caoba. Sonido cálido y proyectado."
   },
   {
@@ -28,6 +31,7 @@ export const productosIniciales =[
     "modelo": "C40",
     "stock": 10,
     "precio": 89990,
+    "imagen": "https://cdnx.jumpseller.com/instruments/image/69260988/C40.webp?1783874307",
     "descripcion": "Nailon, tapa de abeto. Ideal para estudio y flamenco."
   },
   {
@@ -38,6 +42,7 @@ export const productosIniciales =[
     "modelo": "GN20CE",
     "stock": 3,
     "precio": 349990,
+    "imagen": "https://www.chamberlainmusic.com/cdn/shop/products/GN20CE-NS.jpg?v=1627636687",
     "descripcion": "Pickup integrado, afinador incorporado."
   },
   {
@@ -48,6 +53,7 @@ export const productosIniciales =[
     "modelo": "JR1",
     "stock": 6,
     "precio": 79990,
+    "imagen": "https://shop.usa.yamaha.com/media/catalog/product/j/r/jr1.jpg",
     "descripcion": "Tamaño reducido para niños de 6 a 10 años."
   },
   {
@@ -58,6 +64,7 @@ export const productosIniciales =[
     "modelo": "Affinity Strat",
     "stock": 5,
     "precio": 249990,
+    "imagen": "https://overdrive.cl/wp-content/uploads/2025/09/Squier-Affinity-Series-Stratocaster-Maple-Fingerboard-White-Pickguard-Black-zoom.jpg",
     "descripcion": "Cuerpo de álamo, mástil de arce, pastillas SSS."
   },
   {
@@ -68,6 +75,7 @@ export const productosIniciales =[
     "modelo": "Les Paul Std",
     "stock": 4,
     "precio": 329990,
+    "imagen": "https://audiomusicacl.vtexassets.com/arquivos/ids/212797-800-800?v=639208550667170000&width=800&height=800&aspect=true",
     "descripcion": "Cuerpo caoba, tapa arce, pastillas humbucker."
   },
   {
@@ -78,6 +86,7 @@ export const productosIniciales =[
     "modelo": "SG Standard",
     "stock": 3,
     "precio": 319990,
+    "imagen": "https://media.guitarcenter.com/is/image/MMGS7/M22558000001000-00-600x600.jpg",
     "descripcion": "Cuerpo caoba, mástil caoba, 2 humbuckers."
   },
   {
@@ -88,6 +97,7 @@ export const productosIniciales =[
     "modelo": "Affinity Tele",
     "stock": 4,
     "precio": 239990,
+    "imagen": "https://dojiw2m9tvv09.cloudfront.net/135001/product/F_01d52481f66531276f716366cbdddc4f8e29abc9d01751333666797279.jpg?123&t=1791860338",
     "descripcion": "Cuerpo álamo, clavijero vintage, 2 pastillas single."
   },
   {
@@ -98,6 +108,7 @@ export const productosIniciales =[
     "modelo": "ES-335",
     "stock": 2,
     "precio": 549990,
+    "imagen": "http://fatstore.cl/cdn/shop/files/EpiphoneES-335SemiHollowcolorRaspberryTeaBurst-Guitarraelectrica1.jpg?v=1758037813",
     "descripcion": "Semi-hueca, 2 humbuckers, ideal para jazz y blues."
   },
   {
@@ -108,6 +119,7 @@ export const productosIniciales =[
     "modelo": "Affinity PJ",
     "stock": 5,
     "precio": 299990,
+    "imagen": "https://overdrive.cl/wp-content/uploads/2024/05/Squier-Affinity-Series-Precision-Bass-PJ-Black-zoom.jpg",
     "descripcion": "Pickup PJ, cuerpo álamo, mástil arce."
   },
   {
@@ -118,6 +130,7 @@ export const productosIniciales =[
     "modelo": "Player Jazz",
     "stock": 2,
     "precio": 699990,
+    "imagen": "https://www.fender.cl/media/catalog/product/cache/1/image/800x800/9df78eab33525d08d6e5fb8d27136e95/b/2/b269_0147542323v1.jpg",
     "descripcion": "Alder body, 2 Alnico V Jazz single-coil."
   },
   {
@@ -128,6 +141,7 @@ export const productosIniciales =[
     "modelo": "APX700II",
     "stock": 2,
     "precio": 429990,
+    "imagen": "https://www.chamberlainmusic.com/cdn/shop/products/APX700II-BL_24690b78-64f2-4b5b-807d-1c00007d1ddc.jpg?v=1648645228",
     "descripcion": "Electroacústico, afinador incorporado."
   },
   {
@@ -138,6 +152,7 @@ export const productosIniciales =[
     "modelo": "Roadshow",
     "stock": 2,
     "precio": 599990,
+    "imagen": "https://www.melodyhousemi.com/assets/library/Pearl/RS525SC-C-33.jpg",
     "descripcion": "Incluye stands, platillos y pedal de bombo."
   },
   {
@@ -148,6 +163,7 @@ export const productosIniciales =[
     "modelo": "TD-02KV",
     "stock": 2,
     "precio": 799990,
+    "imagen": "https://static.roland.com/assets/images/products/gallery/td-02kv_front_gal.jpg",
     "descripcion": "Módulo TD-02, 8 pads de goma, pedal hi-hat."
   },
   {
@@ -158,6 +174,7 @@ export const productosIniciales =[
     "modelo": "STE1450",
     "stock": 4,
     "precio": 89990,
+    "imagen": "http://smi-music.com/cdn/shop/files/sensitone.jpg?v=1737110142",
     "descripcion": "Acero, 14x5\", 10 tensores."
   },
   {
@@ -168,6 +185,7 @@ export const productosIniciales =[
     "modelo": "A Series",
     "stock": 3,
     "precio": 149990,
+    "imagen": "https://assets-sb.thomann.de/f/49568/3460x3461/7800e9ac33/hauptbild_tps_fo1_521651_521651_16_21-08-11n.jpg/m/1600x0/filters:quality(90)",
     "descripcion": "Latón B20, sonido brillante y claro."
   },
   {
@@ -178,6 +196,7 @@ export const productosIniciales =[
     "modelo": "A Series",
     "stock": 3,
     "precio": 129990,
+    "imagen": "https://zildjian.com/cdn/shop/products/a0024-angle-shot_1_1500x.png?v=1684245519",
     "descripcion": "Latón B20, ataque rápido."
   },
   {
@@ -188,6 +207,7 @@ export const productosIniciales =[
     "modelo": "PSR-E373",
     "stock": 4,
     "precio": 249990,
+    "imagen": "https://dojiw2m9tvv09.cloudfront.net/52889/product/e3739938.jpg",
     "descripcion": "61 teclas sensibles al tacto, 622 voces."
   },
   {
@@ -198,6 +218,7 @@ export const productosIniciales =[
     "modelo": "P-45",
     "stock": 2,
     "precio": 499990,
+    "imagen": "https://audiofans.cl/wp-content/uploads/2023/05/Yamaha-P45-Black-Piano-Digital.jpeg",
     "descripcion": "88 teclas pesadas, 10 voces, pedal sustain incluido."
   },
   {
@@ -208,6 +229,7 @@ export const productosIniciales =[
     "modelo": "MiniLab MKII",
     "stock": 5,
     "precio": 129990,
+    "imagen": "https://b2811249.assetcdn.net/2811249/wp-content/uploads/2020/06/arturia_minilab-mkii_1-2-400x400.jpg?lossy=1&strip=1&webp=1",
     "descripcion": "MIDI controller, 49 mini teclas."
   },
   {
@@ -218,6 +240,7 @@ export const productosIniciales =[
     "modelo": "Hammer 88",
     "stock": 2,
     "precio": 399990,
+    "imagen": "https://www.m-audio.com/assets/images/hammer88/angle.jpg",
     "descripcion": "88 teclas martillo, sin sonidos propios."
   },
   {
@@ -228,6 +251,7 @@ export const productosIniciales =[
     "modelo": "Frontman 15G",
     "stock": 5,
     "precio": 99990,
+    "imagen": "https://r2.gear4music.com/media/138/1383572/600/preview.jpg",
     "descripcion": "15W, distorsión incorporada, entrada auxiliar."
   },
   {
@@ -238,6 +262,7 @@ export const productosIniciales =[
     "modelo": "MG40GFX",
     "stock": 3,
     "precio": 299990,
+    "imagen": "https://images.ctfassets.net/javen7msabdh/47loWGHObi8IHTlZ7zWOgX/af34c9cb884a3e66b07cfeb181768022/mg50gfx-combo-mobile-01.jpg?w=1440&fm=jpg&q=85",
     "descripcion": "40W, 4 canales, efectos digitales integrados."
   },
   {
@@ -248,6 +273,7 @@ export const productosIniciales =[
     "modelo": "HD100",
     "stock": 2,
     "precio": 449990,
+    "imagen": "https://cf1.zzounds.com/media/productmedia/fit%2C2018by3200/quality%2C85/A100s-limited-edition_clipped-df1a237fbaf56c8a4b06ca5980859907.jpg",
     "descripcion": "100W, tweeter integrado, ecualizador de 4 bandas."
   },
   {
@@ -258,6 +284,7 @@ export const productosIniciales =[
     "modelo": "Loudbox Mini",
     "stock": 2,
     "precio": 499990,
+    "imagen": "https://fishman.com/wp-content/uploads/2025/01/fishman-loudbox-mini-gal-3.jpg",
     "descripcion": "60W, 2 canales, reverb y chorus incorporados."
   },
   {
@@ -268,6 +295,7 @@ export const productosIniciales =[
     "modelo": "SM58",
     "stock": 8,
     "precio": 149990,
+    "imagen": "https://products.shureweb.eu/cdn-cgi/image/width=1380,height=1380,format=auto/shure_product_db/product_images/files/b8f/70b/d8-/original/ba5e939c42bab6a7a9f60c5f6805422e.webp",
     "descripcion": "Estándar industria para voz en vivo."
   },
   {
@@ -278,6 +306,7 @@ export const productosIniciales =[
     "modelo": "SM57",
     "stock": 6,
     "precio": 139990,
+    "imagen": "https://cdn11.bigcommerce.com/s-tsw2okvg64/images/stencil/1280x1280/products/13289/88715/1__33625.1625079208.jpg?c=2",
     "descripcion": "Ideal para captura de instrumentos y amplificadores."
   },
   {
@@ -288,6 +317,7 @@ export const productosIniciales =[
     "modelo": "AT2020",
     "stock": 4,
     "precio": 199990,
+    "imagen": "https://www.audio-technica.com/media/converted/resized/6ed3c318ce203913b15268a9ec257945/1000x1000/catalog/product/a/t/at2020_overview_bottom_a1x.webp",
     "descripcion": "Cardioide, XLR, ideal para grabación en estudio."
   },
   {
@@ -298,6 +328,7 @@ export const productosIniciales =[
     "modelo": "Yeti",
     "stock": 5,
     "precio": 299990,
+    "imagen": "https://i5.walmartimages.com/asr/76c2749e-3dae-420e-b4da-47929d82bfd4.e9c9c6dbafd3305b9d0599f5b725e37a.jpeg",
     "descripcion": "USB, 4 patrones polares, ideal para streaming y podcast."
   },
   {
@@ -308,6 +339,7 @@ export const productosIniciales =[
     "modelo": "DS-1",
     "stock": 7,
     "precio": 79990,
+    "imagen": "https://armonicos.cl/6360-thickbox_default/boss-ds-1-distortion.jpg",
     "descripcion": "Clásico pedal de distorsión, 3 controles."
   },
   {
@@ -318,6 +350,7 @@ export const productosIniciales =[
     "modelo": "RV-6",
     "stock": 4,
     "precio": 179990,
+    "imagen": "https://http2.mlstatic.com/D_NQ_NP_914035-CBT111473232141_052026-O.webp",
     "descripcion": "8 modos de reverb, control de shimmer."
   },
   {
@@ -328,6 +361,7 @@ export const productosIniciales =[
     "modelo": "ME-80",
     "stock": 2,
     "precio": 349990,
+    "imagen": "https://static.roland.com/assets/images/products/main/me-80_top_main.jpg",
     "descripcion": "Diseño tipo pedalboard, 8 efectos simultáneos."
   },
   {
@@ -338,6 +372,7 @@ export const productosIniciales =[
     "modelo": "TU-3",
     "stock": 8,
     "precio": 89990,
+    "imagen": "https://armonicos.cl/5434-thickbox_default/boss-tu-3-chromatic-floor-tuner.jpg",
     "descripcion": "Afinador cromático, indicador de tono."
   },
   {
@@ -348,6 +383,7 @@ export const productosIniciales =[
     "modelo": "Carbon Copy",
     "stock": 4,
     "precio": 179990,
+    "imagen": "https://armonicos.cl/4408-thickbox_default/mxr-carbon-copy-analog-delay.jpg",
     "descripcion": "Delay analógico cálido, tiempo 600ms."
   },
   {
@@ -358,6 +394,7 @@ export const productosIniciales =[
     "modelo": "TS9",
     "stock": 6,
     "precio": 99990,
+    "imagen": "https://armonicos.cl/6259-thickbox_default/ibanez-ts9-tube-screamer.jpg",
     "descripcion": "Tube Screamer clásico, sonido suave y orgánico."
   },
   {
@@ -368,6 +405,7 @@ export const productosIniciales =[
     "modelo": "Super Slinky",
     "stock": 25,
     "precio": 8990,
+    "imagen": "https://overdrive.cl/wp-content/uploads/2020/08/ernie-ball-2223-1024x1024.jpg",
     "descripcion": "Juego 6 cuerdas, calibre ligero."
   },
   {
@@ -378,6 +416,7 @@ export const productosIniciales =[
     "modelo": "Earthwood",
     "stock": 20,
     "precio": 10990,
+    "imagen": "https://cdn11.bigcommerce.com/s-luvfwivmyi/products/21991/images/26802/ernie-ball-earthwood-80-20-bronze-acoustic-guitar-strings-2004-light-11-52-14__05537.1657731225.1280.1280.jpg?c=1",
     "descripcion": "Bronce fósforo, sonido cálido."
   },
   {
@@ -388,6 +427,7 @@ export const productosIniciales =[
     "modelo": "Regular Slinky",
     "stock": 12,
     "precio": 14990,
+    "imagen": "https://allmusicstore.cl/wp-content/uploads/2024/01/ERNIE-BALL-REGULAR-SLINKY-BASS-2832-CALIBRE-50-105.png",
     "descripcion": "Cuerdas de níquel enrollado, set 4 cuerdas."
   },
   {
@@ -398,6 +438,7 @@ export const productosIniciales =[
     "modelo": "351",
     "stock": 50,
     "precio": 3990,
+    "imagen": "https://images.equipboard.com/uploads/item/image/23524/fender-351-rock-on-touring-picks-yellow-medium-0-73mm-xl.webp?v=1783323477",
     "descripcion": "Celulosa, grosor medio."
   },
   {
@@ -408,6 +449,7 @@ export const productosIniciales =[
     "modelo": "Trigger",
     "stock": 15,
     "precio": 12990,
+    "imagen": "https://palmmute.cl/wp-content/uploads/2022/09/Capo-Jim-Dunlop-Trigger-Acosutic-Flat-Black.jpg",
     "descripcion": "Capotraste de resorte, compatible 6 cuerdas."
   },
   {
@@ -418,6 +460,7 @@ export const productosIniciales =[
     "modelo": "SN-5",
     "stock": 20,
     "precio": 8990,
+    "imagen": "https://themusicoutlet.ie/wp-content/uploads/2024/06/snark-sn-5-clip-on-tuner-1.jpg",
     "descripcion": "Afinador cromático de clip, pantalla giratoria."
   },
   {
@@ -428,6 +471,7 @@ export const productosIniciales =[
     "modelo": "S100-I-3",
     "stock": 15,
     "precio": 12990,
+    "imagen": "https://cf1.zzounds.com/media/productmedia/fit%2C2018by3200/quality%2C85/s100_instr-bb0c3f0272e03bb698075802f0ba4b40.jpg",
     "descripcion": "Cable trenzado, conectores dorados, 3 metros."
   },
   {
@@ -438,6 +482,7 @@ export const productosIniciales =[
     "modelo": "S100-I-6",
     "stock": 10,
     "precio": 17990,
+    "imagen": "https://cf1.zzounds.com/media/productmedia/fit%2C2018by3200/quality%2C85/s100_instr-bb0c3f0272e03bb698075802f0ba4b40.jpg",
     "descripcion": "Cable trenzado, conectores dorados, 6 metros."
   },
   {
@@ -448,6 +493,7 @@ export const productosIniciales =[
     "modelo": "GS302B",
     "stock": 12,
     "precio": 22990,
+    "imagen": "https://www.promenademusic.co.uk/wp-content/uploads/2022/12/HCGS-302B-picture1.jpg",
     "descripcion": "Soporte plegable con enganche automático."
   },
   {
@@ -458,6 +504,7 @@ export const productosIniciales =[
     "modelo": "WAH-202",
     "stock": 10,
     "precio": 18990,
+    "imagen": "https://cdn11.bigcommerce.com/s-nif33wr8i4/images/stencil/1280x1280/attribute_rule_images/902_source_1596231153.jpg",
     "descripcion": "Montaje a pared, enganche automático."
   },
   {
@@ -468,6 +515,7 @@ export const productosIniciales =[
     "modelo": "Scarlett Solo",
     "stock": 4,
     "precio": 149990,
+    "imagen": "https://armonicos.cl/1880-thickbox_default/focusrite-scarlett-solo-3rd-gen.jpg",
     "descripcion": "1 entrada XLR+instrumento, 2 salidas, 24bit/192kHz."
   },
   {
@@ -478,6 +526,7 @@ export const productosIniciales =[
     "modelo": "ATH-M20x",
     "stock": 6,
     "precio": 79990,
+    "imagen": "https://www.audio-technica.com/media/converted/resized/37dcadad2d45c0561aa2b4b308db0bf7/1000x1000/catalog/product/a/t/ath_m20x_sc1x.webp",
     "descripcion": "Circumaurales, respuesta 15Hz-20kHz."
   },
   {
@@ -488,6 +537,7 @@ export const productosIniciales =[
     "modelo": "ATH-M50x",
     "stock": 4,
     "precio": 219990,
+    "imagen": "https://musicland.cl/wp-content/uploads/2016/07/ath_m50x_2_sq-1-scaled.jpg",
     "descripcion": "Referencia de industria, sonido neutro y detallado."
   },
   {
@@ -498,6 +548,7 @@ export const productosIniciales =[
     "modelo": "HS5",
     "stock": 2,
     "precio": 349990,
+    "imagen": "https://b2811249.assetcdn.net/2811249/wp-content/uploads/2020/06/yamaha-hs5-monitores-activos-campo-cercano-2-400x400.jpg?lossy=1&strip=1&webp=1",
     "descripcion": "Altavoz activo, respuesta plana, ideal mezcla."
   },
   {
@@ -508,6 +559,7 @@ export const productosIniciales =[
     "modelo": "MZP 40",
     "stock": 8,
     "precio": 14990,
+    "imagen": "https://www.bhphotovideo.com/images/fb/sennheiser_003132_close_talking_protection_with_gooseneck_1392339.jpg",
     "descripcion": "Doble malla, brazo flexible con clip."
   }
-]
+];
