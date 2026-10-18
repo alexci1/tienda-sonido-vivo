@@ -24,9 +24,6 @@ export default function Navbar({ cantidadCarrito }) {
           <li>
             <NavLink to="/contacto">CONTACTO</NavLink>
           </li>
-          <li>
-            <NavLink to="/admin">ADMIN CRUD</NavLink>
-          </li>
         </ul>
 
         <div className="nav-actions">
