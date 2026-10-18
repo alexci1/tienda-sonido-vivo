@@ -1,5 +1,5 @@
 // src/App.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -12,12 +12,25 @@ import Productos from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
 import CarritoPage from './pages/Cart';
 import Login from './pages/Login';
+import Nosotros from './pages/About';
+import Contacto from './pages/Contact';
 import AdminCrud from './pages/Admin';
 
 function App() {
   const [productos, setProductos] = useState(productosIniciales);
-  const [carrito, setCarrito] = useState([]);
+
+  // 1. Cargar el carrito desde localStorage al iniciar la app
+  const [carrito, setCarrito] = useState(() => {
+    const carritoGuardado = localStorage.getItem('carrito_sonido_vivo');
+    return carritoGuardado ? JSON.parse(carritoGuardado) : [];
+  });
+
   const [notificacion, setNotificacion] = useState(null);
+
+  // 2. Guardar automáticamente en localStorage cada vez que cambie el carrito
+  useEffect(() => {
+    localStorage.setItem('carrito_sonido_vivo', JSON.stringify(carrito));
+  }, [carrito]);
 
   // Agregar al carrito con mensaje de éxito temporal
   const agregarAlCarrito = (producto, cantidad = 1) => {
@@ -33,10 +46,8 @@ function App() {
       return [...actual, { ...producto, cantidad }];
     });
 
-    // Mostrar mensaje emergente
     setNotificacion(`¡Se agregaron ${cantidad} unidad(es) de "${producto.nombre}" al carrito!`);
 
-    // Auto-ocultar la alerta a los 3 segundos
     setTimeout(() => {
       setNotificacion(null);
     }, 3000);
@@ -105,6 +116,14 @@ function App() {
           <Route 
             path="/product/:id" 
             element={<ProductDetail productos={productos} onAgregar={agregarAlCarrito} />} 
+          />
+          <Route 
+            path="/nosotros" 
+            element={<Nosotros />} 
+          />
+          <Route 
+            path="/contacto" 
+            element={<Contacto />} 
           />
           <Route 
             path="/carrito" 

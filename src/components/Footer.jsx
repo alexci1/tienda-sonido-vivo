@@ -1,3 +1,4 @@
+// src/components/Footer.jsx
 import { Link } from 'react-router-dom';
 
 export default function Footer() {
@@ -6,7 +7,6 @@ export default function Footer() {
       <ul className="social-icon">
         <li className="icon-elem">
           <a href="https://instagram.com" className="icon" target="_blank" rel="noreferrer">
-            {/* Si usas ion-icon, asegúrate de mantener el script en tu index.html */}
             <ion-icon name="logo-instagram"></ion-icon>
           </a>
         </li>
@@ -32,10 +32,13 @@ export default function Footer() {
           <Link to="/" className="menu-icon">Inicio</Link>
         </li>
         <li className="menu-elem">
-          <Link to="/contacto" className="menu-icon">Contacto</Link>
+          <Link to="/products" className="menu-icon">Productos</Link>
         </li>
         <li className="menu-elem">
-          <Link to="/about" className="menu-icon">Nosotros</Link>
+          <Link to="/nosotros" className="menu-icon">Nosotros</Link>
+        </li>
+        <li className="menu-elem">
+          <Link to="/contacto" className="menu-icon">Contacto</Link>
         </li>
       </ul>
       

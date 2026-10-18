@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+// src/components/Navbar.jsx
+import { Link, NavLink } from 'react-router-dom';
 
 export default function Navbar({ cantidadCarrito }) {
   return (
@@ -6,26 +7,25 @@ export default function Navbar({ cantidadCarrito }) {
       <nav className="nav-bar">
         <div className="logo">
           <Link to="/">
-            {/* Si tienes una imagen para Sonido Vivo, cámbiala aquí, o usa texto/icono */}
             <span style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>🎧 SONIDO VIVO</span>
           </Link>
         </div>
 
         <ul className="nav-links">
           <li>
-            <Link to="/">INICIO</Link>
+            <NavLink to="/" end>INICIO</NavLink>
           </li>
           <li>
-            <Link to="/products">PRODUCTOS</Link>
+            <NavLink to="/products">PRODUCTOS</NavLink>
           </li>
           <li>
-            <Link to="/contacto">CONTACTO</Link>
+            <NavLink to="/nosotros">NOSOTROS</NavLink>
           </li>
           <li>
-            <Link to="/about">NOSOTROS</Link>
+            <NavLink to="/contacto">CONTACTO</NavLink>
           </li>
           <li>
-            <Link to="/admin">ADMIN CRUD</Link>
+            <NavLink to="/admin">ADMIN CRUD</NavLink>
           </li>
         </ul>
 
