@@ -41,10 +41,17 @@ export default function Navbar({ cantidadCarrito }) {
         <div className="nav-actions-modern">
           {sesion ? (
             <>
-              {/* Si es Admin o Vendedor, muestra acceso al Panel estilizado */}
-              {esPersonalInterno && (
+              {/* Panel Admin: solo visible para Administrador */}
+              {sesion.rol === 'Administrador' && (
                 <Link to="/admin" className="badge-admin">
-                  ⚙️ PANEL ({sesion.rol.toUpperCase()})
+                  ⚙️ PANEL ADMIN
+                </Link>
+              )}
+
+              {/* Gestión Stock: solo visible para Vendedor */}
+              {sesion.rol === 'Vendedor' && (
+                <Link to="/admin" className="badge-admin">
+                  📦 GESTIÓN STOCK
                 </Link>
               )}
 

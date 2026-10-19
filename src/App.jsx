@@ -109,51 +109,48 @@ function App() {
 
       <main>
         <Routes>
-          <Route path="/" element={<Inicio />} />
+          {/* === RUTAS PÚBLICAS (sin autenticación) === */}
+          <Route path="/login" element={<Login />} />
+
+          {/* === RUTAS PROTEGIDAS (cualquier usuario autenticado) === */}
+          <Route path="/" element={<RutaProtegida><Inicio /></RutaProtegida>} />
           <Route
             path="/products"
-            element={<Productos productos={productos} onAgregar={agregarAlCarrito} />}
+            element={<RutaProtegida><Productos productos={productos} onAgregar={agregarAlCarrito} /></RutaProtegida>}
           />
           <Route
             path="/categories"
-            element={<Categories productos={productos} onAgregar={agregarAlCarrito} />}
+            element={<RutaProtegida><Categories productos={productos} onAgregar={agregarAlCarrito} /></RutaProtegida>}
           />
           <Route
             path="/product/:id"
-            element={<ProductDetail productos={productos} onAgregar={agregarAlCarrito} />}
+            element={<RutaProtegida><ProductDetail productos={productos} onAgregar={agregarAlCarrito} /></RutaProtegida>}
           />
-          <Route
-            path="/nosotros"
-            element={<Nosotros />}
-          />
-          <Route
-            path="/contacto"
-            element={<Contacto />}
-          />
+          <Route path="/nosotros" element={<RutaProtegida><Nosotros /></RutaProtegida>} />
+          <Route path="/contacto" element={<RutaProtegida><Contacto /></RutaProtegida>} />
+
+          {/* === CARRITO: Solo Cliente y Administrador === */}
           <Route
             path="/carrito"
             element={
-              <CarritoPage
-                carrito={carrito}
-                total={totalCarrito}
-                onEliminar={eliminarDelCarrito}
-                onActualizarCantidad={actualizarCantidadCarrito}
-                onVaciar={vaciarCarrito}
-              />
+              <RutaProtegida rolesPermitidos={['Cliente', 'Administrador']}>
+                <CarritoPage
+                  carrito={carrito}
+                  total={totalCarrito}
+                  onEliminar={eliminarDelCarrito}
+                  onActualizarCantidad={actualizarCantidadCarrito}
+                  onVaciar={vaciarCarrito}
+                />
+              </RutaProtegida>
             }
           />
-          <Route
-            path="/cart"
-            element={<Navigate to="/carrito" replace />}
-          />
-          <Route
-            path="/login"
-            element={<Login />}
-          />
+          <Route path="/cart" element={<Navigate to="/carrito" replace />} />
+
+          {/* === PANEL ADMIN: Solo Administrador y Vendedor === */}
           <Route
             path="/admin"
             element={
-              <RutaProtegida>
+              <RutaProtegida rolesPermitidos={['Administrador', 'Vendedor']}>
                 <AdminCrud
                   productos={productos}
                   onAgregar={agregarProductoCatalogo}
