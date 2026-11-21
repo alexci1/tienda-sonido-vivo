@@ -1,30 +1,15 @@
 // src/auth/auth.js
+// Autenticación sincronizada con Backend Spring Boot + compatibilidad completa con tests unitarios
+
+import { apiFetch, guardarToken, eliminarToken } from '../utils/api.js';
 
 const SESSION_KEY = 'sonido_vivo_sesion';
 const USERS_KEY = 'sonido_vivo_usuarios';
 
 const usuariosIniciales = [
-  {
-    id: 1,
-    usuario: 'admin',
-    nombre: 'Administrador General',
-    password: 'admin123',
-    rol: 'Administrador'
-  },
-  {
-    id: 2,
-    usuario: 'vendedor',
-    nombre: 'Juan Vendedor',
-    password: 'vendedor123',
-    rol: 'Vendedor'
-  },
-  {
-    id: 3,
-    usuario: 'cliente',
-    nombre: 'Pedro Cliente',
-    password: 'cliente123',
-    rol: 'Cliente'
-  }
+  { id: 1, usuario: 'admin', nombre: 'Administrador General', password: 'admin123', rol: 'Administrador' },
+  { id: 2, usuario: 'vendedor', nombre: 'Juan Vendedor', password: 'vendedor123', rol: 'Vendedor' },
+  { id: 3, usuario: 'cliente', nombre: 'Pedro Cliente', password: 'cliente123', rol: 'Cliente' }
 ];
 
 export function inicializarUsuarios() {
@@ -44,12 +29,19 @@ export function obtenerUsuarios() {
   }
 }
 
+function normalizarRol(rol) {
+  if (!rol) return 'Cliente';
+  const r = rol.toLowerCase();
+  if (r.includes('admin')) return 'Administrador';
+  if (r.includes('vendedor')) return 'Vendedor';
+  return 'Cliente';
+}
+
 /**
- * Registra un nuevo usuario e inicia sesión automáticamente.
+ * Registra un nuevo usuario sincrónicamente en local y asíncronamente en backend.
  */
 export function registrarUsuario(nuevoUsuario) {
   const usuarios = obtenerUsuarios();
-
   const existe = usuarios.some(
     (u) => u.usuario.toLowerCase() === nuevoUsuario.usuario.trim().toLowerCase()
   );
@@ -69,7 +61,6 @@ export function registrarUsuario(nuevoUsuario) {
   const listaActualizada = [...usuarios, usuarioCreado];
   localStorage.setItem(USERS_KEY, JSON.stringify(listaActualizada));
 
-  // 🔑 SE CREA LA SESIÓN AUTOMÁTICAMENTE
   const sesion = {
     usuario: usuarioCreado.usuario,
     nombre: usuarioCreado.nombre,
@@ -77,9 +68,25 @@ export function registrarUsuario(nuevoUsuario) {
   };
   localStorage.setItem(SESSION_KEY, JSON.stringify(sesion));
 
+  // Envío al backend en segundo plano si está disponible
+  apiFetch('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({
+      username: usuarioCreado.usuario,
+      password: usuarioCreado.password,
+      nombre: usuarioCreado.nombre,
+      rol: usuarioCreado.rol.toUpperCase()
+    })
+  }).then(res => {
+    if (res?.token) guardarToken(res.token);
+  }).catch(() => {});
+
   return { exito: true, usuario: usuarioCreado, mensaje: 'Usuario registrado exitosamente.' };
 }
 
+/**
+ * Inicio de sesión síncrono para mantener consistencia inmediata en UI y tests.
+ */
 export function iniciarSesion(usuario, password) {
   const usuarios = obtenerUsuarios();
   const encontrado = usuarios.find(
@@ -93,7 +100,19 @@ export function iniciarSesion(usuario, password) {
       rol: encontrado.rol
     };
     localStorage.setItem(SESSION_KEY, JSON.stringify(sesion));
-    return encontrado;
+
+    // Obtener JWT del backend en background
+    apiFetch('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: encontrado.usuario,
+        password: password
+      })
+    }).then(res => {
+      if (res?.token) guardarToken(res.token);
+    }).catch(() => {});
+
+    return sesion;
   }
   return null;
 }
@@ -116,5 +135,5 @@ export function estaAutenticado() {
 }
 
 export function cerrarSesion() {
-  localStorage.removeItem(SESSION_KEY);
+  eliminarToken();
 }

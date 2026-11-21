@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import RutaProtegida from './components/RutaProtegida';
 
 import { productosIniciales } from './data/productosSonidoVivo.js';
+import { apiProductos } from './utils/api.js';
 
 import Inicio from './pages/Index';
 import Productos from './pages/Products';
@@ -19,6 +20,19 @@ import Categories from './pages/Categories.jsx';
 
 function App() {
   const [productos, setProductos] = useState(productosIniciales);
+
+  // Cargar productos desde el Backend Spring Boot si está disponible
+  useEffect(() => {
+    apiProductos.obtenerTodos()
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setProductos(data);
+        }
+      })
+      .catch((err) => {
+        console.warn('Backend desconectado, usando catálogo local:', err.message);
+      });
+  }, []);
 
   // 1. Cargar el carrito desde localStorage al iniciar la app
   const [carrito, setCarrito] = useState(() => {
@@ -78,12 +92,22 @@ function App() {
 
   const totalCarrito = carrito.reduce((suma, item) => suma + item.precio * item.cantidad, 0);
 
-  const agregarProductoCatalogo = (nuevoProd) => {
-    setProductos([...productos, { ...nuevoProd, id: Date.now() }]);
+  const agregarProductoCatalogo = async (nuevoProd) => {
+    try {
+      const prodBackend = await apiProductos.crearOActualizar(nuevoProd);
+      setProductos((actuales) => [...actuales, prodBackend || nuevoProd]);
+    } catch {
+      setProductos((actuales) => [...actuales, { ...nuevoProd, id: Date.now() }]);
+    }
   };
 
-  const eliminarProductoCatalogo = (identificador) => {
-    setProductos(productos.filter((p) => (p.codigo || p.id) !== identificador));
+  const eliminarProductoCatalogo = async (identificador) => {
+    try {
+      await apiProductos.eliminar(identificador);
+    } catch (err) {
+      console.warn('Eliminación local:', err.message);
+    }
+    setProductos((actuales) => actuales.filter((p) => (p.codigo || p.id) !== identificador));
   };
 
   return (

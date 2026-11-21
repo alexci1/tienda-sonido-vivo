@@ -1,16 +1,42 @@
-# React + Vite
+# 🎸 Tienda Sonido Vivo — Proyecto Semestral Full Stack (DSY1104)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Proyecto semestral para la asignatura **Desarrollo Full Stack II (DSY1104)** - Versión Oficial Parcial 3 y EFT.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 📁 Estructura del Repositorio
 
-## React Compiler
+Siguiendo la pauta oficial del proyecto semestral:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```text
+tienda-sonido-vivo/
+├── frontend/           # Aplicación Front-End React (Vite, Bootstrap, Tests)
+├── backend/            # Aplicación Back-End Spring Boot (REST API, JWT, Swagger)
+├── database/           # Scripts SQL y esquemas de base de datos MySQL
+└── documentacion/      # Pautas, rúbricas y manual de ejecución
+```
 
-## Expanding the Oxlint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## 🚀 Guía de Inicio Rápido
+
+Para ver las instrucciones detalladas de configuración, puertos, base de datos y credenciales, consulta:
+👉 [INSTRUCCIONES_EJECUCION.md](documentacion/INSTRUCCIONES_EJECUCION.md)
+
+### 1. Iniciar Base de Datos
+- Asegúrate de tener MySQL corriendo en el puerto 3306.
+
+### 2. Iniciar Backend
+```bash
+cd backend
+mvn spring-boot:run
+```
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+
+### 3. Iniciar Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+- App React: `http://localhost:5173`

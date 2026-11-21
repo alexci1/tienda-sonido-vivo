@@ -1,6 +1,7 @@
 // src/pages/Cart.jsx
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { apiPedidos } from '../utils/api.js';
 
 export default function Cart({ carrito, total, onEliminar, onActualizarCantidad, onVaciar }) {
   const [paso, setPaso] = useState('carrito'); // 'carrito' | 'checkout' | 'confirmacion'
@@ -28,15 +29,21 @@ export default function Cart({ carrito, total, onEliminar, onActualizarCantidad,
   const costoEnvio = metodoEntrega === 'despacho' ? 4990 : 0;
   const totalFinal = total + costoEnvio;
 
-  const handleFinalizarCompra = (e) => {
+  const handleFinalizarCompra = async (e) => {
     e.preventDefault();
 
     // Generar objeto del pedido final
     const nuevoPedido = {
       id: 'SV-' + Math.floor(100000 + Math.random() * 900000),
       fecha: new Date().toLocaleDateString('es-CL'),
-      cliente: datosEnvio,
-      items: carrito,
+      clienteNombre: datosEnvio.nombre,
+      clienteEmail: datosEnvio.email,
+      clienteRut: datosEnvio.rut,
+      clienteTelefono: datosEnvio.telefono,
+      clienteCiudad: datosEnvio.ciudad,
+      clienteRegion: datosEnvio.region,
+      clienteDireccion: datosEnvio.direccion,
+      itemsJson: JSON.stringify(carrito),
       metodoEntrega,
       metodoPago,
       total: totalFinal,
@@ -44,11 +51,21 @@ export default function Cart({ carrito, total, onEliminar, onActualizarCantidad,
       seguimiento: 'STK-' + Math.floor(10000000 + Math.random() * 90000000)
     };
 
-    setPedidoRealizado(nuevoPedido);
+    // Intentar persistir en Backend Spring Boot
+    try {
+      const pedidoCreado = await apiPedidos.crearPedido(nuevoPedido);
+      if (pedidoCreado) {
+        setPedidoRealizado({ ...pedidoCreado, cliente: datosEnvio });
+      } else {
+        setPedidoRealizado({ ...nuevoPedido, cliente: datosEnvio });
+      }
+    } catch {
+      setPedidoRealizado({ ...nuevoPedido, cliente: datosEnvio });
+    }
 
-    // Guardar en localStorage el historial de pedidos
+    // Respaldo en localStorage
     const pedidosAnteriores = JSON.parse(localStorage.getItem('pedidos_sonido_vivo') || '[]');
-    localStorage.setItem('pedidos_sonido_vivo', JSON.stringify([nuevoPedido, ...pedidosAnteriores]));
+    localStorage.setItem('pedidos_sonido_vivo', JSON.stringify([{ ...nuevoPedido, cliente: datosEnvio }, ...pedidosAnteriores]));
 
     // Vaciar el carrito
     onVaciar();

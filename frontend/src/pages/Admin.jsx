@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { cerrarSesion, obtenerSesion, obtenerUsuarios } from "../auth/auth.js";
+import { apiPedidos, apiUsuarios } from "../utils/api.js";
 
 export default function Admin({ productos, onAgregar, onEliminar }) {
   const navigate = useNavigate();
@@ -26,22 +27,60 @@ export default function Admin({ productos, onAgregar, onEliminar }) {
   });
 
   useEffect(() => {
-    // Cargar órdenes registradas en localStorage por el Checkout
-    const pedidosGuardados = JSON.parse(
-      localStorage.getItem("pedidos_sonido_vivo") || "[]"
-    );
-    setPedidos(pedidosGuardados);
+    // 1. Cargar pedidos desde Backend Spring Boot (con fallback a localStorage)
+    apiPedidos.obtenerTodos()
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          // Normalizar formato de cliente si viene plano
+          const pedidosNormalizados = data.map(p => ({
+            ...p,
+            cliente: p.cliente || {
+              nombre: p.clienteNombre,
+              email: p.clienteEmail,
+              telefono: p.clienteTelefono
+            }
+          }));
+          setPedidos(pedidosNormalizados);
+        } else {
+          const pedidosGuardados = JSON.parse(localStorage.getItem("pedidos_sonido_vivo") || "[]");
+          setPedidos(pedidosGuardados);
+        }
+      })
+      .catch(() => {
+        const pedidosGuardados = JSON.parse(localStorage.getItem("pedidos_sonido_vivo") || "[]");
+        setPedidos(pedidosGuardados);
+      });
 
-    // Cargar usuarios
-    setUsuarios(obtenerUsuarios());
-  }, []);
+    // 2. Cargar usuarios desde Backend si es Admin (con fallback a local)
+    if (sesion?.rol === "Administrador") {
+      apiUsuarios.obtenerTodos()
+        .then((users) => {
+          if (Array.isArray(users) && users.length > 0) {
+            setUsuarios(users);
+          } else {
+            setUsuarios(obtenerUsuarios());
+          }
+        })
+        .catch(() => {
+          setUsuarios(obtenerUsuarios());
+        });
+    } else {
+      setUsuarios(obtenerUsuarios());
+    }
+  }, [sesion]);
 
   function salir() {
     cerrarSesion();
     navigate("/login");
   }
 
-  const handleCambiarEstadoPedido = (pedidoId, nuevoEstado) => {
+  const handleCambiarEstadoPedido = async (pedidoId, nuevoEstado) => {
+    try {
+      await apiPedidos.actualizarEstado(pedidoId, nuevoEstado);
+    } catch (err) {
+      console.warn("Actualizando estado en local:", err.message);
+    }
+
     const pedidosActualizados = pedidos.map((p) =>
       p.id === pedidoId ? { ...p, estado: nuevoEstado } : p
     );
