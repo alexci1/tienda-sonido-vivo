@@ -12,6 +12,7 @@ com\sonidovivo\model\Usuario.class
 com\sonidovivo\repository\ProductoRepository.class
 com\sonidovivo\config\OpenApiConfig.class
 com\sonidovivo\dto\LoginResponse$LoginResponseBuilder.class
+com\sonidovivo\service\PedidoService$1.class
 com\sonidovivo\config\SecurityConfig.class
 com\sonidovivo\model\Pedido.class
 com\sonidovivo\security\JwtAuthenticationFilter.class
