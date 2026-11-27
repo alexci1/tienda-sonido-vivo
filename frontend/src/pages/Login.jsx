@@ -1,16 +1,13 @@
 // src/pages/Login.jsx
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  iniciarSesion,
-  registrarUsuario,
-  inicializarUsuarios,
-  obtenerSesion
-} from "../auth/auth.js";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "../context/useAuth.js";
 
 export default function Login() {
   const [modo, setModo] = useState("login"); // 'login' | 'registro'
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { sesion, login, register } = useAuth();
 
   // Estados para Login
   const [usuarioLogin, setUsuarioLogin] = useState("");
@@ -25,23 +22,21 @@ export default function Login() {
   // Feedback
   const [error, setError] = useState("");
   const [exito, setExito] = useState("");
+  const [cargando, setCargando] = useState(false);
+
+  const sesionExpirada = searchParams.get("sesionExpirada") === "true";
 
   useEffect(() => {
-    // 1. Inicializar los datos por defecto al montar
-    inicializarUsuarios();
-
-    // 2. Redirigir automáticamente si ya existe una sesión activa
-    const sesionActual = obtenerSesion();
-    if (sesionActual) {
-      if (sesionActual.rol === "Administrador" || sesionActual.rol === "Vendedor") {
-        navigate("/admin");
+    if (sesion) {
+      if (sesion.rol === "Administrador" || sesion.rol === "Vendedor") {
+        navigate("/admin", { replace: true });
       } else {
-        navigate("/products");
+        navigate("/products", { replace: true });
       }
     }
-  }, [navigate]);
+  }, [sesion, navigate]);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setExito("");
@@ -51,22 +46,22 @@ export default function Login() {
       return;
     }
 
-    const usuarioLogueado = iniciarSesion(usuarioLogin.trim(), passLogin);
-
-    if (!usuarioLogueado) {
-      setError("Usuario o contraseña incorrectos.");
-      return;
-    }
-
-    // Redirección según el rol del usuario logueado
-    if (usuarioLogueado.rol === "Administrador" || usuarioLogueado.rol === "Vendedor") {
-      navigate("/admin");
-    } else {
-      navigate("/products");
+    setCargando(true);
+    try {
+      const usuarioLogueado = await login(usuarioLogin.trim(), passLogin);
+      if (usuarioLogueado.rol === "Administrador" || usuarioLogueado.rol === "Vendedor") {
+        navigate("/admin");
+      } else {
+        navigate("/products");
+      }
+    } catch (err) {
+      setError(err.message || "Usuario o contraseña incorrectos.");
+    } finally {
+      setCargando(false);
     }
   };
 
-  const handleRegistro = (e) => {
+  const handleRegistro = async (e) => {
     e.preventDefault();
     setError("");
     setExito("");
@@ -81,33 +76,40 @@ export default function Login() {
       return;
     }
 
-    const resultado = registrarUsuario({
-      nombre: nombreReg,
-      usuario: usuarioReg,
-      password: passReg,
-      rol: "Cliente",
-    });
+    setCargando(true);
+    try {
+      const resultado = await register({
+        nombre: nombreReg,
+        username: usuarioReg,
+        password: passReg,
+      });
 
-    if (!resultado.exito) {
-      setError(resultado.mensaje);
-      return;
-    }
+      if (!resultado.exito) {
+        setError(resultado.mensaje);
+        return;
+      }
 
-    setExito("¡Registro exitoso! Redirigiendo a la tienda...");
-
-    // Redirección usando la sesión creada automáticamente
-    setTimeout(() => {
+      setExito("¡Registro exitoso! Redirigiendo a la tienda...");
       navigate("/products");
-    }, 1000);
+    } finally {
+      setCargando(false);
+    }
   };
 
   return (
     <div className="container py-5 text-light">
       <div className="row justify-content-center">
         <div className="col-md-6 col-lg-5 bg-dark p-4 rounded border border-secondary shadow">
+          {sesionExpirada && (
+            <div className="alert alert-warning py-2 text-center mb-3">
+              Tu sesión expiró o no es válida. Inicia sesión nuevamente.
+            </div>
+          )}
+
           {/* Selector de pestañas Login / Registro */}
           <div className="d-flex mb-4 border-bottom border-secondary">
             <button
+              type="button"
               className={`btn flex-fill py-2 fw-bold rounded-0 ${
                 modo === "login" ? "btn-primary" : "btn-dark text-secondary"
               }`}
@@ -120,6 +122,7 @@ export default function Login() {
               Iniciar Sesión
             </button>
             <button
+              type="button"
               className={`btn flex-fill py-2 fw-bold rounded-0 ${
                 modo === "registro" ? "btn-primary" : "btn-dark text-secondary"
               }`}
@@ -133,11 +136,9 @@ export default function Login() {
             </button>
           </div>
 
-          {/* MENSAJES DE ALERTA */}
           {error && <div className="alert alert-danger py-2 text-center mb-3">{error}</div>}
           {exito && <div className="alert alert-success py-2 text-center mb-3">{exito}</div>}
 
-          {/* FORMULARIO LOGIN */}
           {modo === "login" ? (
             <form onSubmit={handleLogin} noValidate>
               <h3 className="mb-3 text-center fw-bold text-white">BIENVENIDO</h3>
@@ -163,11 +164,14 @@ export default function Login() {
                 />
               </div>
 
-              <button className="btn btn-primary w-100 fw-bold py-2 mb-3" type="submit">
-                Ingresar a Sonido Vivo
+              <button
+                className="btn btn-primary w-100 fw-bold py-2 mb-3"
+                type="submit"
+                disabled={cargando}
+              >
+                {cargando ? "Validando credenciales..." : "Ingresar a Sonido Vivo"}
               </button>
 
-              {/* Muestra de credenciales para el evaluador */}
               <div className="bg-secondary bg-opacity-25 p-3 rounded text-secondary fs-6 border border-secondary mt-3">
                 <p className="mb-1 text-white fw-semibold">🔑 Cuentas de prueba disponibles:</p>
                 <ul className="mb-0 ps-3">
@@ -178,7 +182,6 @@ export default function Login() {
               </div>
             </form>
           ) : (
-            /* FORMULARIO REGISTRO */
             <form onSubmit={handleRegistro} noValidate>
               <h3 className="mb-3 text-center fw-bold text-white">CREAR CUENTA</h3>
 
@@ -224,8 +227,12 @@ export default function Login() {
                 />
               </div>
 
-              <button className="btn btn-success w-100 fw-bold py-2" type="submit">
-                Registrarse como Cliente
+              <button
+                className="btn btn-success w-100 fw-bold py-2"
+                type="submit"
+                disabled={cargando}
+              >
+                {cargando ? "Registrando cuenta..." : "Registrarse como Cliente"}
               </button>
             </form>
           )}

@@ -1,28 +1,27 @@
 // src/components/Navbar.jsx
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { obtenerSesion, cerrarSesion } from '../auth/auth.js';
+import { useAuth } from '../context/useAuth.js';
 
 export default function Navbar({ cantidadCarrito }) {
   const navigate = useNavigate();
-  const sesion = obtenerSesion();
+  const { sesion, logout } = useAuth();
 
   const handleCerrarSesion = () => {
-    cerrarSesion();
+    logout();
     navigate('/login');
   };
 
-  // Verificamos si el usuario activo es Admin o Vendedor
-  const esPersonalInterno = sesion?.rol === 'Administrador' || sesion?.rol === 'Vendedor';
+  const esCliente = sesion?.rol === 'Cliente';
 
   return (
     <header className="navbar-modern-header">
       <nav className="nav-bar-modern">
         <div className="logo">
           <Link to="/" className="logo-brand">
-            <img 
-              src="/images/icon/icon-sonido-vivo.png" 
-              alt="Sonido Vivo Logo" 
-              className="navbar-logo-img" 
+            <img
+              src="/images/icon/icon-sonido-vivo.png"
+              alt="Sonido Vivo Logo"
+              className="navbar-logo-img"
             />
             <span>
               <span style={{ color: '#ffffff' }}>SONIDO</span>{' '}
@@ -34,6 +33,9 @@ export default function Navbar({ cantidadCarrito }) {
         <ul className="nav-links-modern">
           <li><NavLink to="/" end>INICIO</NavLink></li>
           <li><NavLink to="/categories">CATÁLOGO</NavLink></li>
+          {esCliente && (
+            <li><NavLink to="/mis-pedidos">MIS PEDIDOS</NavLink></li>
+          )}
           <li><NavLink to="/nosotros">NOSOTROS</NavLink></li>
           <li><NavLink to="/contacto">CONTACTO</NavLink></li>
         </ul>
@@ -55,13 +57,12 @@ export default function Navbar({ cantidadCarrito }) {
                 </Link>
               )}
 
-              {/* Saludo y rol del usuario con diseño tech */}
+              {/* Saludo y rol del usuario */}
               <div className="user-badge-container">
                 <span className="user-name">👤 {sesion.nombre || sesion.usuario}</span>
                 <span className="user-role-tag">{sesion.rol}</span>
               </div>
 
-              {/* Botón Salir rediseñado */}
               <button onClick={handleCerrarSesion} className="btn-logout-tech">
                 SALIR
               </button>
@@ -72,8 +73,8 @@ export default function Navbar({ cantidadCarrito }) {
             </Link>
           )}
 
-          {/* El carrito se oculta automáticamente si es Administrador o Vendedor */}
-          {!esPersonalInterno && (
+          {/* El carrito es accesible únicamente para el rol Cliente */}
+          {esCliente && (
             <Link to="/carrito" className="cart-pill">
               <span>🛒</span>
               <span className="cart-text">CARRITO</span>

@@ -2,25 +2,35 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiPedidos } from '../utils/api.js';
+import { useAuth } from '../context/useAuth.js';
 
-export default function Cart({ carrito, total, onEliminar, onActualizarCantidad, onVaciar }) {
+export default function Cart({
+  carrito,
+  total,
+  onEliminar,
+  onActualizarCantidad,
+  onVaciar,
+  onPedidoCreado,
+}) {
+  const { sesion } = useAuth();
   const [paso, setPaso] = useState('carrito'); // 'carrito' | 'checkout' | 'confirmacion'
-  
-  // Datos del formulario de compra
+
   const [metodoEntrega, setMetodoEntrega] = useState('despacho'); // 'despacho' | 'retiro'
   const [datosEnvio, setDatosEnvio] = useState({
-    nombre: '',
+    nombre: sesion?.nombre || '',
     rut: '',
     email: '',
     telefono: '',
     region: 'Valparaíso',
     ciudad: 'Viña del Mar',
     direccion: '',
-    notas: ''
+    notas: '',
   });
 
   const [metodoPago, setMetodoPago] = useState('webpay'); // 'webpay' | 'transferencia'
   const [pedidoRealizado, setPedidoRealizado] = useState(null);
+  const [procesando, setProcesando] = useState(false);
+  const [errorCheckout, setErrorCheckout] = useState('');
 
   const handleInputChange = (e) => {
     setDatosEnvio({ ...datosEnvio, [e.target.name]: e.target.value });
@@ -31,10 +41,10 @@ export default function Cart({ carrito, total, onEliminar, onActualizarCantidad,
 
   const handleFinalizarCompra = async (e) => {
     e.preventDefault();
+    setErrorCheckout('');
+    setProcesando(true);
 
-    // Generar objeto del pedido final
     const nuevoPedido = {
-      id: 'SV-' + Math.floor(100000 + Math.random() * 900000),
       fecha: new Date().toLocaleDateString('es-CL'),
       clienteNombre: datosEnvio.nombre,
       clienteEmail: datosEnvio.email,
@@ -43,33 +53,33 @@ export default function Cart({ carrito, total, onEliminar, onActualizarCantidad,
       clienteCiudad: datosEnvio.ciudad,
       clienteRegion: datosEnvio.region,
       clienteDireccion: datosEnvio.direccion,
-      itemsJson: JSON.stringify(carrito),
+      itemsJson: JSON.stringify(
+        carrito.map((item) => ({
+          codigo: item.codigo || item.id,
+          nombre: item.nombre,
+          precio: item.precio,
+          cantidad: item.cantidad,
+        }))
+      ),
       metodoEntrega,
       metodoPago,
       total: totalFinal,
       estado: 'En preparación',
-      seguimiento: 'STK-' + Math.floor(10000000 + Math.random() * 90000000)
     };
 
-    // Intentar persistir en Backend Spring Boot
     try {
       const pedidoCreado = await apiPedidos.crearPedido(nuevoPedido);
-      if (pedidoCreado) {
-        setPedidoRealizado({ ...pedidoCreado, cliente: datosEnvio });
-      } else {
-        setPedidoRealizado({ ...nuevoPedido, cliente: datosEnvio });
+      setPedidoRealizado({ ...pedidoCreado, cliente: datosEnvio });
+      onVaciar();
+      if (onPedidoCreado) {
+        await onPedidoCreado();
       }
-    } catch {
-      setPedidoRealizado({ ...nuevoPedido, cliente: datosEnvio });
+      setPaso('confirmacion');
+    } catch (err) {
+      setErrorCheckout(err.message || 'No se pudo procesar el pedido en el servidor.');
+    } finally {
+      setProcesando(false);
     }
-
-    // Respaldo en localStorage
-    const pedidosAnteriores = JSON.parse(localStorage.getItem('pedidos_sonido_vivo') || '[]');
-    localStorage.setItem('pedidos_sonido_vivo', JSON.stringify([{ ...nuevoPedido, cliente: datosEnvio }, ...pedidosAnteriores]));
-
-    // Vaciar el carrito
-    onVaciar();
-    setPaso('confirmacion');
   };
 
   if (paso === 'confirmacion' && pedidoRealizado) {
@@ -77,20 +87,25 @@ export default function Cart({ carrito, total, onEliminar, onActualizarCantidad,
       <div className="container py-5 text-light text-center" style={{ maxWidth: '700px' }}>
         <div className="bg-dark p-5 rounded border border-success shadow-lg">
           <div className="fs-1 text-success mb-3">🎉 ¡Pedido Confirmado!</div>
-          <h2 className="text-white mb-2">Gracias por tu compra, {pedidoRealizado.cliente.nombre}</h2>
-          <p className="text-secondary">Tu orden ha sido registrada exitosamente en nuestro sistema.</p>
+          <h2 className="text-white mb-2">Gracias por tu compra, {pedidoRealizado.cliente?.nombre || pedidoRealizado.clienteNombre}</h2>
+          <p className="text-secondary">Tu orden ha sido registrada exitosamente en la base de datos.</p>
 
           <div className="bg-secondary bg-opacity-25 p-3 rounded text-start my-4 border border-secondary">
             <p className="mb-1"><strong>N° de Pedido:</strong> <span className="text-primary fw-bold">{pedidoRealizado.id}</span></p>
             <p className="mb-1"><strong>N° Seguimiento:</strong> <span className="text-warning fw-bold">{pedidoRealizado.seguimiento}</span></p>
             <p className="mb-1"><strong>Tipo de Entrega:</strong> {pedidoRealizado.metodoEntrega === 'despacho' ? '🚚 Despacho a Domicilio' : '🏪 Retiro en Tienda (Viña del Mar)'}</p>
             <p className="mb-1"><strong>Estado Actual:</strong> <span className="badge bg-info text-dark">{pedidoRealizado.estado}</span></p>
-            <p className="mb-0"><strong>Total Pagado:</strong> ${pedidoRealizado.total.toLocaleString("es-CL")}</p>
+            <p className="mb-0"><strong>Total Pagado:</strong> ${pedidoRealizado.total?.toLocaleString('es-CL')}</p>
           </div>
 
-          <Link to="/products" className="btn btn-primary btn-lg w-100 fw-bold">
-            Volver al Catálogo
-          </Link>
+          <div className="d-flex gap-2 justify-content-center flex-wrap">
+            <Link to="/mis-pedidos" className="btn btn-outline-info btn-lg fw-bold">
+              Ver Mis Pedidos
+            </Link>
+            <Link to="/products" className="btn btn-primary btn-lg fw-bold">
+              Volver al Catálogo
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -114,9 +129,14 @@ export default function Cart({ carrito, total, onEliminar, onActualizarCantidad,
         {paso === 'carrito' ? 'CARRITO DE COMPRAS' : 'FINALIZAR PEDIDO'}
       </h2>
 
+      {errorCheckout && (
+        <div className="alert alert-danger text-center mb-4">
+          <strong>Error al procesar el pedido:</strong> {errorCheckout}
+        </div>
+      )}
+
       {paso === 'carrito' ? (
         <div className="row g-4">
-          {/* Listado de items */}
           <div className="col-lg-8">
             <div className="bg-dark p-4 rounded border border-secondary">
               {carrito.map((item) => {
@@ -124,7 +144,7 @@ export default function Cart({ carrito, total, onEliminar, onActualizarCantidad,
                 return (
                   <div key={keyItem} className="d-flex align-items-center justify-content-between py-3 border-bottom border-secondary gap-3 flex-wrap">
                     <img
-                      src={item.imagen || "https://via.placeholder.com/80?text=Audio"}
+                      src={item.imagen || 'https://via.placeholder.com/80?text=Audio'}
                       alt={item.nombre}
                       className="rounded"
                       style={{ width: '70px', height: '70px', objectFit: 'cover' }}
@@ -133,10 +153,9 @@ export default function Cart({ carrito, total, onEliminar, onActualizarCantidad,
                     <div className="flex-grow-1">
                       <h5 className="text-white mb-1">{item.nombre}</h5>
                       <span className="badge bg-secondary mb-1">{item.marca}</span>
-                      <p className="text-primary fw-bold mb-0">${item.precio.toLocaleString("es-CL")}</p>
+                      <p className="text-primary fw-bold mb-0">${item.precio.toLocaleString('es-CL')}</p>
                     </div>
 
-                    {/* Selector de cantidad */}
                     <div className="d-flex align-items-center gap-2">
                       <button
                         className="btn btn-sm btn-outline-light"
@@ -153,9 +172,8 @@ export default function Cart({ carrito, total, onEliminar, onActualizarCantidad,
                       </button>
                     </div>
 
-                    {/* Subtotal e Eliminar */}
                     <div className="text-end">
-                      <p className="fw-bold mb-1">${(item.precio * item.cantidad).toLocaleString("es-CL")}</p>
+                      <p className="fw-bold mb-1">${(item.precio * item.cantidad).toLocaleString('es-CL')}</p>
                       <button
                         className="btn btn-sm btn-outline-danger"
                         onClick={() => onEliminar(keyItem)}
@@ -178,13 +196,12 @@ export default function Cart({ carrito, total, onEliminar, onActualizarCantidad,
             </div>
           </div>
 
-          {/* Resumen de orden */}
           <div className="col-lg-4">
             <div className="bg-dark p-4 rounded border border-secondary sticky-top" style={{ top: '100px' }}>
               <h4 className="text-white mb-3">Resumen de Compra</h4>
               <div className="d-flex justify-content-between mb-2">
                 <span className="text-secondary">Subtotal:</span>
-                <span className="fw-bold">${total.toLocaleString("es-CL")}</span>
+                <span className="fw-bold">${total.toLocaleString('es-CL')}</span>
               </div>
               <div className="d-flex justify-content-between mb-3">
                 <span className="text-secondary">Despacho:</span>
@@ -193,7 +210,7 @@ export default function Cart({ carrito, total, onEliminar, onActualizarCantidad,
               <hr className="border-secondary" />
               <div className="d-flex justify-content-between mb-4 fs-5 fw-bold">
                 <span>Total Estimado:</span>
-                <span className="text-primary">${total.toLocaleString("es-CL")}</span>
+                <span className="text-primary">${total.toLocaleString('es-CL')}</span>
               </div>
 
               <button
@@ -206,10 +223,8 @@ export default function Cart({ carrito, total, onEliminar, onActualizarCantidad,
           </div>
         </div>
       ) : (
-        /* FORMULARIO DE CHECKOUT */
         <form onSubmit={handleFinalizarCompra} className="row g-4">
           <div className="col-lg-7">
-            {/* 1. Método de Entrega */}
             <div className="bg-dark p-4 rounded border border-secondary mb-4">
               <h4 className="text-white mb-3">1. Método de Entrega</h4>
               <div className="d-flex gap-3 mb-3">
@@ -236,7 +251,6 @@ export default function Cart({ carrito, total, onEliminar, onActualizarCantidad,
               )}
             </div>
 
-            {/* 2. Datos del Cliente */}
             <div className="bg-dark p-4 rounded border border-secondary mb-4">
               <h4 className="text-white mb-3">2. Datos de Contacto y Envíos</h4>
               <div className="row g-3">
@@ -333,7 +347,6 @@ export default function Cart({ carrito, total, onEliminar, onActualizarCantidad,
               </div>
             </div>
 
-            {/* 3. Método de Pago */}
             <div className="bg-dark p-4 rounded border border-secondary">
               <h4 className="text-white mb-3">3. Medio de Pago</h4>
               <div className="form-check mb-2">
@@ -368,16 +381,15 @@ export default function Cart({ carrito, total, onEliminar, onActualizarCantidad,
             </div>
           </div>
 
-          {/* Resumen Final de Pago */}
           <div className="col-lg-5">
             <div className="bg-dark p-4 rounded border border-secondary sticky-top" style={{ top: '100px' }}>
               <h4 className="text-white mb-3">Resumen del Pedido</h4>
-              
+
               <div className="mb-3" style={{ maxHeight: '200px', overflowY: 'auto' }}>
                 {carrito.map((item) => (
                   <div key={item.codigo || item.id} className="d-flex justify-content-between mb-2 fs-6">
                     <span className="text-secondary">{item.cantidad}x {item.nombre}</span>
-                    <span>${(item.precio * item.cantidad).toLocaleString("es-CL")}</span>
+                    <span>${(item.precio * item.cantidad).toLocaleString('es-CL')}</span>
                   </div>
                 ))}
               </div>
@@ -386,7 +398,7 @@ export default function Cart({ carrito, total, onEliminar, onActualizarCantidad,
 
               <div className="d-flex justify-content-between mb-2">
                 <span className="text-secondary">Subtotal Productos:</span>
-                <span>${total.toLocaleString("es-CL")}</span>
+                <span>${total.toLocaleString('es-CL')}</span>
               </div>
 
               <div className="d-flex justify-content-between mb-2">
@@ -398,17 +410,18 @@ export default function Cart({ carrito, total, onEliminar, onActualizarCantidad,
 
               <div className="d-flex justify-content-between mb-4 fs-4 fw-bold">
                 <span>Total Final:</span>
-                <span className="text-primary">${totalFinal.toLocaleString("es-CL")}</span>
+                <span className="text-primary">${totalFinal.toLocaleString('es-CL')}</span>
               </div>
 
-              <button type="submit" className="btn btn-success w-100 btn-lg fw-bold mb-2">
-                Confirmar y Pagar
+              <button type="submit" className="btn btn-success w-100 btn-lg fw-bold mb-2" disabled={procesando}>
+                {procesando ? 'Procesando pedido...' : 'Confirmar y Pagar'}
               </button>
 
               <button
                 type="button"
                 className="btn btn-outline-secondary w-100"
                 onClick={() => setPaso('carrito')}
+                disabled={procesando}
               >
                 ← Volver al Carrito
               </button>

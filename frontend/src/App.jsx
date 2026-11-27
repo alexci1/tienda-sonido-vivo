@@ -1,5 +1,5 @@
 // src/App.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -12,6 +12,7 @@ import Inicio from './pages/Index';
 import Productos from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
 import CarritoPage from './pages/Cart';
+import MisPedidos from './pages/MisPedidos';
 import Login from './pages/Login';
 import Nosotros from './pages/About';
 import Contacto from './pages/Contact';
@@ -21,39 +22,56 @@ import Categories from './pages/Categories.jsx';
 function App() {
   const [productos, setProductos] = useState(productosIniciales);
 
-  // Cargar productos desde el Backend Spring Boot si está disponible
+  const recargarProductos = useCallback(async () => {
+    try {
+      const data = await apiProductos.obtenerTodos();
+      if (Array.isArray(data) && data.length > 0) {
+        setProductos(data);
+      }
+    } catch (err) {
+      console.warn('No se pudo conectar al backend de productos, usando respaldo local:', err.message);
+    }
+  }, []);
+
   useEffect(() => {
-    apiProductos.obtenerTodos()
+    let activo = true;
+    apiProductos
+      .obtenerTodos()
       .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
+        if (activo && Array.isArray(data) && data.length > 0) {
           setProductos(data);
         }
       })
       .catch((err) => {
-        console.warn('Backend desconectado, usando catálogo local:', err.message);
+        console.warn('No se pudo conectar al backend de productos, usando respaldo local:', err.message);
       });
+    return () => {
+      activo = false;
+    };
   }, []);
 
-  // 1. Cargar el carrito desde localStorage al iniciar la app
   const [carrito, setCarrito] = useState(() => {
-    const carritoGuardado = localStorage.getItem('carrito_sonido_vivo');
-    return carritoGuardado ? JSON.parse(carritoGuardado) : [];
+    try {
+      const carritoGuardado = localStorage.getItem('carrito_sonido_vivo');
+      return carritoGuardado ? JSON.parse(carritoGuardado) : [];
+    } catch {
+      return [];
+    }
   });
 
   const [notificacion, setNotificacion] = useState(null);
 
-  // 2. Guardar automáticamente en localStorage cada vez que cambie el carrito
   useEffect(() => {
     localStorage.setItem('carrito_sonido_vivo', JSON.stringify(carrito));
   }, [carrito]);
 
-  // Agregar al carrito con mensaje de éxito temporal
   const agregarAlCarrito = (producto, cantidad = 1) => {
     setCarrito((actual) => {
-      const existe = actual.find((item) => (item.codigo || item.id) === (producto.codigo || producto.id));
+      const idTarget = producto.codigo || producto.id;
+      const existe = actual.find((item) => (item.codigo || item.id) === idTarget);
       if (existe) {
         return actual.map((item) =>
-          (item.codigo || item.id) === (producto.codigo || producto.id)
+          (item.codigo || item.id) === idTarget
             ? { ...item, cantidad: item.cantidad + cantidad }
             : item
         );
@@ -62,10 +80,7 @@ function App() {
     });
 
     setNotificacion(`¡Se agregaron ${cantidad} unidad(es) de "${producto.nombre}" al carrito!`);
-
-    setTimeout(() => {
-      setNotificacion(null);
-    }, 3000);
+    setTimeout(() => setNotificacion(null), 3000);
   };
 
   const actualizarCantidadCarrito = (identificador, nuevaCantidad) => {
@@ -93,20 +108,21 @@ function App() {
   const totalCarrito = carrito.reduce((suma, item) => suma + item.precio * item.cantidad, 0);
 
   const agregarProductoCatalogo = async (nuevoProd) => {
-    try {
-      const prodBackend = await apiProductos.crearOActualizar(nuevoProd);
-      setProductos((actuales) => [...actuales, prodBackend || nuevoProd]);
-    } catch {
-      setProductos((actuales) => [...actuales, { ...nuevoProd, id: Date.now() }]);
-    }
+    const prodBackend = await apiProductos.crear(nuevoProd);
+    setProductos((actuales) => [...actuales, prodBackend]);
+    return prodBackend;
+  };
+
+  const actualizarProductoCatalogo = async (codigo, datosProd) => {
+    const prodActualizado = await apiProductos.actualizar(codigo, datosProd);
+    setProductos((actuales) =>
+      actuales.map((p) => ((p.codigo || p.id) === codigo ? prodActualizado : p))
+    );
+    return prodActualizado;
   };
 
   const eliminarProductoCatalogo = async (identificador) => {
-    try {
-      await apiProductos.eliminar(identificador);
-    } catch (err) {
-      console.warn('Eliminación local:', err.message);
-    }
+    await apiProductos.eliminar(identificador);
     setProductos((actuales) => actuales.filter((p) => (p.codigo || p.id) !== identificador));
   };
 
@@ -114,7 +130,6 @@ function App() {
     <div className="app-container">
       <Navbar cantidadCarrito={carrito.reduce((acc, item) => acc + item.cantidad, 0)} />
 
-      {/* Banner flotante de notificación */}
       {notificacion && (
         <div
           className="alert alert-success alert-dismissible fade show text-center m-0 border-0 rounded-0"
@@ -133,7 +148,7 @@ function App() {
 
       <main>
         <Routes>
-          {/* === RUTAS PÚBLICAS (sin autenticación) === */}
+          {/* === RUTAS PÚBLICAS === */}
           <Route path="/login" element={<Login />} />
 
           {/* === RUTAS PROTEGIDAS (cualquier usuario autenticado) === */}
@@ -153,24 +168,33 @@ function App() {
           <Route path="/nosotros" element={<RutaProtegida><Nosotros /></RutaProtegida>} />
           <Route path="/contacto" element={<RutaProtegida><Contacto /></RutaProtegida>} />
 
-          {/* === CARRITO: Solo Cliente y Administrador === */}
+          {/* === CARRITO Y PEDIDOS DEL CLIENTE === */}
           <Route
             path="/carrito"
             element={
-              <RutaProtegida rolesPermitidos={['Cliente', 'Administrador']}>
+              <RutaProtegida rolesPermitidos={['Cliente']}>
                 <CarritoPage
                   carrito={carrito}
                   total={totalCarrito}
                   onEliminar={eliminarDelCarrito}
                   onActualizarCantidad={actualizarCantidadCarrito}
                   onVaciar={vaciarCarrito}
+                  onPedidoCreado={recargarProductos}
                 />
               </RutaProtegida>
             }
           />
           <Route path="/cart" element={<Navigate to="/carrito" replace />} />
+          <Route
+            path="/mis-pedidos"
+            element={
+              <RutaProtegida rolesPermitidos={['Cliente']}>
+                <MisPedidos />
+              </RutaProtegida>
+            }
+          />
 
-          {/* === PANEL ADMIN: Solo Administrador y Vendedor === */}
+          {/* === PANEL ADMIN / STOCK: Solo Administrador y Vendedor === */}
           <Route
             path="/admin"
             element={
@@ -178,6 +202,7 @@ function App() {
                 <AdminCrud
                   productos={productos}
                   onAgregar={agregarProductoCatalogo}
+                  onActualizar={actualizarProductoCatalogo}
                   onEliminar={eliminarProductoCatalogo}
                 />
               </RutaProtegida>
