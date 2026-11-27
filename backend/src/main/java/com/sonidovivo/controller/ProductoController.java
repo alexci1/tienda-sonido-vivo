@@ -40,15 +40,29 @@ public class ProductoController {
     }
 
     @PostMapping
-    @Operation(summary = "Crear o actualizar producto (Solo Administrador y Vendedor)")
-    public ResponseEntity<?> guardar(@Valid @RequestBody Producto producto) {
+    @Operation(summary = "Crear un nuevo producto en el catálogo (Solo Administrador y Vendedor)")
+    public ResponseEntity<?> crear(@Valid @RequestBody Producto producto) {
         try {
-            Producto guardado = productoService.guardar(producto);
+            Producto guardado = productoService.crear(producto);
             return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "Error al guardar producto", "mensaje", e.getMessage()));
+                    .body(Map.of("error", "Error al crear producto", "mensaje", e.getMessage()));
         }
+    }
+
+    @PutMapping("/{codigo}")
+    @Operation(summary = "Actualizar un producto existente por código (Solo Administrador y Vendedor)")
+    public ResponseEntity<?> actualizar(
+            @PathVariable String codigo,
+            @Valid @RequestBody Producto producto) {
+        return productoService.actualizar(codigo, producto)
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Producto no encontrado: " + codigo)));
     }
 
     @DeleteMapping("/{codigo}")
