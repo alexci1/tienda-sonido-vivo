@@ -7,14 +7,14 @@ describe('Servicio de Autenticación (auth.js)', () => {
     localStorage.clear();
   });
 
-  it('debe retornar null o falsy con credenciales incorrectas', () => {
-    const resultado = iniciarSesion('usuario_falso', '1234');
+  it('debe retornar null o falsy con credenciales incorrectas', async () => {
+    const resultado = await iniciarSesion('usuario_falso', '1234');
     expect(resultado).toBeFalsy(); // Acepta null, false o undefined
     expect(estaAutenticado()).toBe(false);
   });
 
-  it('debe retornar el objeto de usuario y guardar en localStorage con credenciales válidas', () => {
-    const resultado = iniciarSesion('admin', 'admin123');
+  it('debe retornar el objeto de usuario y guardar en localStorage con credenciales válidas', async () => {
+    const resultado = await iniciarSesion('admin', 'admin123');
     expect(resultado).toBeDefined(); // Devuelve el objeto del usuario
     expect(resultado.usuario).toBe('admin');
     expect(estaAutenticado()).toBe(true);
@@ -23,8 +23,8 @@ describe('Servicio de Autenticación (auth.js)', () => {
     expect(sesion.usuario).toBe('admin');
   });
 
-  it('debe cerrar sesión y limpiar el localStorage', () => {
-    iniciarSesion('admin', 'admin123');
+  it('debe cerrar sesión y limpiar el localStorage', async () => {
+    await iniciarSesion('admin', 'admin123');
     expect(estaAutenticado()).toBe(true);
 
     cerrarSesion();

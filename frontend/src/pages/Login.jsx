@@ -22,11 +22,17 @@ export default function Login() {
   const [passReg, setPassReg] = useState("");
   const [confirmPassReg, setConfirmPassReg] = useState("");
 
-  // Feedback
   const [error, setError] = useState("");
   const [exito, setExito] = useState("");
+  const [cargando, setCargando] = useState(false);
 
   useEffect(() => {
+    // 0. Detectar si fue redirigido por sesión expirada
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("sesionExpirada") === "true") {
+      setError("Tu sesión ha expirado o no es válida. Por favor, vuelve a iniciar sesión.");
+    }
+
     // 1. Inicializar los datos por defecto al montar
     inicializarUsuarios();
 
@@ -41,7 +47,7 @@ export default function Login() {
     }
   }, [navigate]);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setExito("");
@@ -51,22 +57,34 @@ export default function Login() {
       return;
     }
 
-    const usuarioLogueado = iniciarSesion(usuarioLogin.trim(), passLogin);
+    setCargando(true);
+    try {
+      const usuarioLogueado = await iniciarSesion(usuarioLogin.trim(), passLogin);
 
-    if (!usuarioLogueado) {
-      setError("Usuario o contraseña incorrectos.");
-      return;
-    }
+      if (!usuarioLogueado) {
+        setError("Usuario o contraseña incorrectos.");
+        setCargando(false);
+        return;
+      }
 
-    // Redirección según el rol del usuario logueado
-    if (usuarioLogueado.rol === "Administrador" || usuarioLogueado.rol === "Vendedor") {
-      navigate("/admin");
-    } else {
-      navigate("/products");
+      setExito("¡Bienvenido! Redirigiendo...");
+
+      // Redirección según el rol del usuario logueado
+      setTimeout(() => {
+        if (usuarioLogueado.rol === "Administrador" || usuarioLogueado.rol === "Vendedor") {
+          navigate("/admin");
+        } else {
+          navigate("/products");
+        }
+      }, 500);
+    } catch (err) {
+      setError("Error al iniciar sesión: " + (err.message || "Problema de conexión"));
+    } finally {
+      setCargando(false);
     }
   };
 
-  const handleRegistro = (e) => {
+  const handleRegistro = async (e) => {
     e.preventDefault();
     setError("");
     setExito("");
@@ -81,24 +99,32 @@ export default function Login() {
       return;
     }
 
-    const resultado = registrarUsuario({
-      nombre: nombreReg,
-      usuario: usuarioReg,
-      password: passReg,
-      rol: "Cliente",
-    });
+    setCargando(true);
+    try {
+      const resultado = await registrarUsuario({
+        nombre: nombreReg,
+        usuario: usuarioReg,
+        password: passReg,
+        rol: "Cliente",
+      });
 
-    if (!resultado.exito) {
-      setError(resultado.mensaje);
-      return;
+      if (!resultado.exito) {
+        setError(resultado.mensaje);
+        setCargando(false);
+        return;
+      }
+
+      setExito("¡Registro exitoso! Redirigiendo a la tienda...");
+
+      // Redirección usando la sesión creada automáticamente
+      setTimeout(() => {
+        navigate("/products");
+      }, 1000);
+    } catch (err) {
+      setError("Error al registrar: " + (err.message || "Problema de conexión"));
+    } finally {
+      setCargando(false);
     }
-
-    setExito("¡Registro exitoso! Redirigiendo a la tienda...");
-
-    // Redirección usando la sesión creada automáticamente
-    setTimeout(() => {
-      navigate("/products");
-    }, 1000);
   };
 
   return (
@@ -163,8 +189,8 @@ export default function Login() {
                 />
               </div>
 
-              <button className="btn btn-primary w-100 fw-bold py-2 mb-3" type="submit">
-                Ingresar a Sonido Vivo
+              <button className="btn btn-primary w-100 fw-bold py-2 mb-3" type="submit" disabled={cargando}>
+                {cargando ? "Conectando..." : "Ingresar a Sonido Vivo"}
               </button>
 
               {/* Muestra de credenciales para el evaluador */}
@@ -224,8 +250,8 @@ export default function Login() {
                 />
               </div>
 
-              <button className="btn btn-success w-100 fw-bold py-2" type="submit">
-                Registrarse como Cliente
+              <button className="btn btn-success w-100 fw-bold py-2" type="submit" disabled={cargando}>
+                {cargando ? "Registrando..." : "Registrarse como Cliente"}
               </button>
             </form>
           )}

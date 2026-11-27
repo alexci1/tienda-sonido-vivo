@@ -38,12 +38,54 @@ function normalizarRol(rol) {
 }
 
 /**
- * Registra un nuevo usuario sincrónicamente en local y asíncronamente en backend.
+ * Registro de usuario consumiendo Spring Boot /api/auth/register de forma asíncrona.
+ * Si el backend responde, guarda el JWT. Si no está disponible, usa fallback local.
  */
-export function registrarUsuario(nuevoUsuario) {
+export async function registrarUsuario(nuevoUsuario) {
+  const usuarioLimpio = nuevoUsuario.usuario ? nuevoUsuario.usuario.trim() : '';
+  const nombreLimpio = nuevoUsuario.nombre ? nuevoUsuario.nombre.trim() : usuarioLimpio;
+  const rolSolicitado = nuevoUsuario.rol ? nuevoUsuario.rol : 'Cliente';
+
+  // 1. Intentar registrar en Backend Spring Boot
+  try {
+    const res = await apiFetch('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: usuarioLimpio,
+        password: nuevoUsuario.password,
+        nombre: nombreLimpio,
+        rol: rolSolicitado.toUpperCase()
+      })
+    });
+
+    if (res && res.token) {
+      guardarToken(res.token);
+      const sesion = {
+        usuario: res.username,
+        nombre: res.nombre,
+        rol: normalizarRol(res.rol)
+      };
+      localStorage.setItem(SESSION_KEY, JSON.stringify(sesion));
+
+      // Sincronizar también con la lista local
+      const usuarios = obtenerUsuarios();
+      if (!usuarios.some((u) => u.usuario.toLowerCase() === usuarioLimpio.toLowerCase())) {
+        localStorage.setItem(USERS_KEY, JSON.stringify([...usuarios, { ...sesion, password: nuevoUsuario.password }]));
+      }
+
+      return { exito: true, usuario: sesion, mensaje: 'Usuario registrado exitosamente en el servidor.' };
+    }
+  } catch (err) {
+    console.warn('[Auth] No se pudo registrar en backend, recurriendo a validación local:', err.message);
+    if (err.message && err.message.toLowerCase().includes('ya está registrado')) {
+      return { exito: false, mensaje: 'El nombre de usuario ya está registrado.' };
+    }
+  }
+
+  // 2. Fallback local si backend está apagado o en entorno de tests sin backend
   const usuarios = obtenerUsuarios();
   const existe = usuarios.some(
-    (u) => u.usuario.toLowerCase() === nuevoUsuario.usuario.trim().toLowerCase()
+    (u) => u.usuario.toLowerCase() === usuarioLimpio.toLowerCase()
   );
 
   if (existe) {
@@ -52,10 +94,10 @@ export function registrarUsuario(nuevoUsuario) {
 
   const usuarioCreado = {
     id: Date.now(),
-    usuario: nuevoUsuario.usuario.trim(),
-    nombre: nuevoUsuario.nombre ? nuevoUsuario.nombre.trim() : nuevoUsuario.usuario.trim(),
+    usuario: usuarioLimpio,
+    nombre: nombreLimpio,
     password: nuevoUsuario.password,
-    rol: nuevoUsuario.rol || 'Cliente'
+    rol: rolSolicitado
   };
 
   const listaActualizada = [...usuarios, usuarioCreado];
@@ -68,29 +110,48 @@ export function registrarUsuario(nuevoUsuario) {
   };
   localStorage.setItem(SESSION_KEY, JSON.stringify(sesion));
 
-  // Envío al backend en segundo plano si está disponible
-  apiFetch('/auth/register', {
-    method: 'POST',
-    body: JSON.stringify({
-      username: usuarioCreado.usuario,
-      password: usuarioCreado.password,
-      nombre: usuarioCreado.nombre,
-      rol: usuarioCreado.rol.toUpperCase()
-    })
-  }).then(res => {
-    if (res?.token) guardarToken(res.token);
-  }).catch(() => {});
-
-  return { exito: true, usuario: usuarioCreado, mensaje: 'Usuario registrado exitosamente.' };
+  return { exito: true, usuario: usuarioCreado, mensaje: 'Usuario registrado exitosamente (Modo Local).' };
 }
 
 /**
- * Inicio de sesión síncrono para mantener consistencia inmediata en UI y tests.
+ * Inicio de sesión consumiendo Spring Boot /api/auth/login de forma asíncrona.
+ * Devuelve la sesión del usuario si las credenciales son válidas y almacena el JWT.
  */
-export function iniciarSesion(usuario, password) {
+export async function iniciarSesion(usuario, password) {
+  const usuarioLimpio = usuario ? usuario.trim() : '';
+
+  // 1. Intentar autenticar contra el Backend Spring Boot
+  try {
+    const res = await apiFetch('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: usuarioLimpio,
+        password: password
+      })
+    });
+
+    if (res && res.token) {
+      guardarToken(res.token);
+      const sesion = {
+        usuario: res.username,
+        nombre: res.nombre,
+        rol: normalizarRol(res.rol)
+      };
+      localStorage.setItem(SESSION_KEY, JSON.stringify(sesion));
+      return sesion;
+    }
+  } catch (err) {
+    console.warn('[Auth] Fallo en autenticación con Backend:', err.message);
+    // Si el backend respondió activamente con error de credenciales, no usar fallback
+    if (err.message && (err.message.includes('401') || err.message.includes('Credenciales') || err.message.includes('Bad credentials'))) {
+      return null;
+    }
+  }
+
+  // 2. Fallback local para entorno de tests unitarios o cuando backend no esté levantado
   const usuarios = obtenerUsuarios();
   const encontrado = usuarios.find(
-    (u) => u.usuario.toLowerCase() === usuario.trim().toLowerCase() && u.password === password
+    (u) => u.usuario.toLowerCase() === usuarioLimpio.toLowerCase() && u.password === password
   );
 
   if (encontrado) {
@@ -100,20 +161,9 @@ export function iniciarSesion(usuario, password) {
       rol: encontrado.rol
     };
     localStorage.setItem(SESSION_KEY, JSON.stringify(sesion));
-
-    // Obtener JWT del backend en background
-    apiFetch('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({
-        username: encontrado.usuario,
-        password: password
-      })
-    }).then(res => {
-      if (res?.token) guardarToken(res.token);
-    }).catch(() => {});
-
     return sesion;
   }
+
   return null;
 }
 

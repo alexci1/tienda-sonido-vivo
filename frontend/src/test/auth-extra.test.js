@@ -61,17 +61,16 @@ describe('Usuarios predeterminados', () => {
 describe('Registro e inicio de sesión', () => {
   beforeEach(() => localStorage.clear());
 
-  it('registra un usuario nuevo', () => {
-    expect(
-      registrarUsuario({
-        usuario: 'maria',
-        password: 'abc123'
-      }).exito
-    ).toBe(true);
+  it('registra un usuario nuevo', async () => {
+    const res = await registrarUsuario({
+      usuario: 'maria',
+      password: 'abc123'
+    });
+    expect(res.exito).toBe(true);
   });
 
-  it('elimina espacios externos del usuario', () => {
-    const resultado = registrarUsuario({
+  it('elimina espacios externos del usuario', async () => {
+    const resultado = await registrarUsuario({
       usuario: '  maria  ',
       password: 'abc123'
     });
@@ -79,32 +78,31 @@ describe('Registro e inicio de sesión', () => {
     expect(resultado.usuario.usuario).toBe('maria');
   });
 
-  it('rechaza usuarios duplicados ignorando mayúsculas', () => {
-    registrarUsuario({ usuario: 'maria', password: 'abc123' });
+  it('rechaza usuarios duplicados ignorando mayúsculas', async () => {
+    await registrarUsuario({ usuario: 'maria', password: 'abc123' });
 
-    expect(
-      registrarUsuario({
-        usuario: 'MARIA',
-        password: 'xyz789'
-      }).exito
-    ).toBe(false);
+    const res = await registrarUsuario({
+      usuario: 'MARIA',
+      password: 'xyz789'
+    });
+    expect(res.exito).toBe(false);
   });
 
-  it('asigna el rol Cliente por defecto', () => {
-    expect(
-      registrarUsuario({
-        usuario: 'ana',
-        password: 'pass'
-      }).usuario.rol
-    ).toBe('Cliente');
+  it('asigna el rol Cliente por defecto', async () => {
+    const res = await registrarUsuario({
+      usuario: 'ana',
+      password: 'pass'
+    });
+    expect(res.usuario.rol).toBe('Cliente');
   });
 
-  it('inicia sesión después de registrar', () => {
-    registrarUsuario({ usuario: 'ana', password: 'pass' });
+  it('inicia sesión después de registrar', async () => {
+    await registrarUsuario({ usuario: 'ana', password: 'pass' });
     expect(estaAutenticado()).toBe(true);
   });
 
-  it('rechaza una contraseña incorrecta', () => {
-    expect(iniciarSesion('admin', 'incorrecta')).toBeNull();
+  it('rechaza una contraseña incorrecta', async () => {
+    const res = await iniciarSesion('admin', 'incorrecta');
+    expect(res).toBeNull();
   });
 });
