@@ -26,6 +26,32 @@ public class ProductoService {
         return productoRepository.findByCategoriaIgnoreCase(categoria);
     }
 
+    public Producto crear(Producto producto) {
+        if (producto.getCodigo() == null || producto.getCodigo().isBlank()) {
+            throw new IllegalArgumentException("El código del producto es obligatorio");
+        }
+        String codigoNormalizado = producto.getCodigo().trim();
+        if (productoRepository.existsById(codigoNormalizado)) {
+            throw new IllegalStateException("Ya existe un producto con el código '" + codigoNormalizado + "'");
+        }
+        producto.setCodigo(codigoNormalizado);
+        return productoRepository.save(producto);
+    }
+
+    public Optional<Producto> actualizar(String codigo, Producto datosActualizados) {
+        return productoRepository.findById(codigo).map(existente -> {
+            existente.setNombre(datosActualizados.getNombre());
+            existente.setMarca(datosActualizados.getMarca());
+            existente.setModelo(datosActualizados.getModelo());
+            existente.setCategoria(datosActualizados.getCategoria());
+            existente.setDescripcion(datosActualizados.getDescripcion());
+            existente.setImagen(datosActualizados.getImagen());
+            existente.setPrecio(datosActualizados.getPrecio());
+            existente.setStock(datosActualizados.getStock());
+            return productoRepository.save(existente);
+        });
+    }
+
     public Producto guardar(Producto producto) {
         return productoRepository.save(producto);
     }

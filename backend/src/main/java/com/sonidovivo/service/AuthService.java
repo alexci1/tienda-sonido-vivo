@@ -14,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,11 +27,12 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     public LoginResponse login(LoginRequest request) {
+        String usernameNormalizado = request.getUsername().trim();
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+                new UsernamePasswordAuthenticationToken(usernameNormalizado, request.getPassword())
         );
 
-        Usuario usuario = usuarioRepository.findByUsername(request.getUsername())
+        Usuario usuario = usuarioRepository.findByUsername(usernameNormalizado)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         String token = jwtUtil.generarToken(usuario.getUsername(), usuario.getRol().name(), usuario.getNombre());
@@ -43,22 +46,17 @@ public class AuthService {
     }
 
     public LoginResponse register(RegisterRequest request) {
-        if (usuarioRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("El nombre de usuario '" + request.getUsername() + "' ya está registrado.");
+        String usernameNormalizado = request.getUsername().trim();
+        if (usuarioRepository.existsByUsername(usernameNormalizado)) {
+            throw new IllegalArgumentException("El nombre de usuario '" + usernameNormalizado + "' ya está registrado.");
         }
 
-        Rol rolAsignado = Rol.CLIENTE;
-        if (request.getRol() != null && !request.getRol().isBlank()) {
-            try {
-                rolAsignado = Rol.valueOf(request.getRol().toUpperCase());
-            } catch (IllegalArgumentException ignored) {}
-        }
-
+        // Por seguridad, el registro público siempre asigna el rol CLIENTE
         Usuario nuevo = Usuario.builder()
-                .username(request.getUsername().trim())
+                .username(usernameNormalizado)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .nombre(request.getNombre().trim())
-                .rol(rolAsignado)
+                .rol(Rol.CLIENTE)
                 .build();
 
         usuarioRepository.save(nuevo);
@@ -73,7 +71,43 @@ public class AuthService {
                 .build();
     }
 
+    public Map<String, Object> obtenerPerfil(String username) {
+        Usuario usuario = usuarioRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        return Map.of(
+                "id", usuario.getId(),
+                "username", usuario.getUsername(),
+                "nombre", usuario.getNombre(),
+                "rol", usuario.getRol().name()
+        );
+    }
+
     public List<Usuario> listarUsuarios() {
         return usuarioRepository.findAll();
+    }
+
+    public Optional<Usuario> actualizarRol(Long id, String nuevoRol) {
+        Rol rolValido;
+        try {
+            rolValido = Rol.valueOf(nuevoRol.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Rol inválido. Permitidos: ADMINISTRADOR, VENDEDOR, CLIENTE");
+        }
+        return usuarioRepository.findById(id).map(usuario -> {
+            usuario.setRol(rolValido);
+            return usuarioRepository.save(usuario);
+        });
+    }
+
+    public boolean eliminarUsuario(Long id, String adminUsername) {
+        Optional<Usuario> opt = usuarioRepository.findById(id);
+        if (opt.isEmpty()) {
+            return false;
+        }
+        if (opt.get().getUsername().equalsIgnoreCase(adminUsername)) {
+            throw new IllegalArgumentException("No puedes eliminar tu propio usuario administrador en sesión");
+        }
+        usuarioRepository.deleteById(id);
+        return true;
     }
 }

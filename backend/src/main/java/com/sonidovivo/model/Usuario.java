@@ -1,5 +1,6 @@
 package com.sonidovivo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -21,6 +22,7 @@ public class Usuario {
     @Column(unique = true, nullable = false, length = 60)
     private String username;
 
+    @JsonIgnore
     @NotBlank
     @Column(nullable = false)
     private String password;

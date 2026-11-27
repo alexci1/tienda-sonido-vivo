@@ -34,6 +34,10 @@ public class Pedido {
     @Column(length = 60)
     private String seguimiento;
 
+    // Usuario autenticado propietario del pedido
+    @Column(length = 60)
+    private String clienteUsername;
+
     // Datos del cliente destinatario
     @Column(length = 120)
     private String clienteNombre;
