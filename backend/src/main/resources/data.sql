@@ -3,12 +3,8 @@
 -- Base de Datos: sonido_vivo
 -- ============================================================
 
--- 1. USUARIOS INICIALES (Contraseña de prueba: admin123, vendedor123, cliente123)
-INSERT INTO usuarios (id, username, password, nombre, rol) VALUES
-(1, 'admin', '$2a$10$4B9a87gG8y7F7f6E5d4C3b2A1Z0y9x8w7v6u5t4s3r2q1p0o9n8m7', 'Administrador General', 'ADMINISTRADOR'),
-(2, 'vendedor', '$2a$10$4B9a87gG8y7F7f6E5d4C3b2A1Z0y9x8w7v6u5t4s3r2q1p0o9n8m7', 'Juan Vendedor', 'VENDEDOR'),
-(3, 'cliente', '$2a$10$4B9a87gG8y7F7f6E5d4C3b2A1Z0y9x8w7v6u5t4s3r2q1p0o9n8m7', 'Pedro Cliente', 'CLIENTE')
-ON DUPLICATE KEY UPDATE nombre=VALUES(nombre);
+-- 1. USUARIOS INICIALES: gestionados por DataLoader.java con BCrypt real
+-- (admin/admin123, vendedor/vendedor123, cliente/cliente123)
 
 -- 2. PRODUCTOS INICIALES (45 Instrumentos y Equipos de Audio)
 INSERT INTO productos (codigo, nombre, marca, modelo, categoria, descripcion, imagen, precio, stock) VALUES ('GA001', 'Guitarra Acústica Folk', 'Yamaha', 'F310', 'Guitarras Acústicas', 'Tapa de abeto, aros y fondo de meranti. Ideal para iniciantes.', 'https://i.ebayimg.com/images/g/hv4AAeSwJKtpFodI/s-l1200.jpg', 129990, 8) ON DUPLICATE KEY UPDATE stock=VALUES(stock);

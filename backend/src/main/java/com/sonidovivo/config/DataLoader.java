@@ -13,41 +13,31 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class DataLoader {
 
+    private static final String PLACEHOLDER_HASH = "$2a$10$4B9a87gG8y7F7f6E5d4C3b2A1Z0y9x8w7v6u5t4s3r2q1p0o9n8m7";
+
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Bean
     public CommandLineRunner initUsers() {
         return args -> {
-            // Inicializar Usuario Administrador
-            if (!usuarioRepository.existsByUsername("admin")) {
-                usuarioRepository.save(Usuario.builder()
-                        .username("admin")
-                        .password(passwordEncoder.encode("admin123"))
-                        .nombre("Administrador General")
-                        .rol(Rol.ADMINISTRADOR)
-                        .build());
-            }
-
-            // Inicializar Usuario Vendedor
-            if (!usuarioRepository.existsByUsername("vendedor")) {
-                usuarioRepository.save(Usuario.builder()
-                        .username("vendedor")
-                        .password(passwordEncoder.encode("vendedor123"))
-                        .nombre("Juan Vendedor")
-                        .rol(Rol.VENDEDOR)
-                        .build());
-            }
-
-            // Inicializar Usuario Cliente
-            if (!usuarioRepository.existsByUsername("cliente")) {
-                usuarioRepository.save(Usuario.builder()
-                        .username("cliente")
-                        .password(passwordEncoder.encode("cliente123"))
-                        .nombre("Pedro Cliente")
-                        .rol(Rol.CLIENTE)
-                        .build());
-            }
+            asegurarUsuario("admin", "admin123", "Administrador General", Rol.ADMINISTRADOR);
+            asegurarUsuario("vendedor", "vendedor123", "Juan Vendedor", Rol.VENDEDOR);
+            asegurarUsuario("cliente", "cliente123", "Pedro Cliente", Rol.CLIENTE);
         };
+    }
+
+    private void asegurarUsuario(String username, String rawPassword, String nombre, Rol rol) {
+        usuarioRepository.findByUsername(username).ifPresentOrElse(existente -> {
+            if (PLACEHOLDER_HASH.equals(existente.getPassword())) {
+                existente.setPassword(passwordEncoder.encode(rawPassword));
+                usuarioRepository.save(existente);
+            }
+        }, () -> usuarioRepository.save(Usuario.builder()
+                .username(username)
+                .password(passwordEncoder.encode(rawPassword))
+                .nombre(nombre)
+                .rol(rol)
+                .build()));
     }
 }
